@@ -1,0 +1,21 @@
+project_name: cloudfront-invalidation-metrics
+
+builds:
+  - id: cloudfront-invalidation-metrics
+    main: .
+    binary: cloudfront-invalidation-metrics
+    ldflags:
+      - -extldflags '-static'
+    env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+    goos: [ linux ]
+    goarch: [ amd64 ]
+
+release:
+  prerelease: auto
+  name_template: "CloudFront Invalidation Metrics Lambda {{.Version}}"
+
+  github:
+    owner: skpr
+    name: cloudfront-invalidation-metrics

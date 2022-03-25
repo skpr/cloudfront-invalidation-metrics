@@ -1,0 +1,44 @@
+version: 2
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - fmt
+      - lint
+      - vet
+  release:
+    jobs:
+      - release:
+          context: org-global
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              # Only on tags formatted like v0.1.1
+              only: /^v\d+\.\d+\.\d+[0-9A-Za-z-]*$/
+
+jobs:
+  fmt:
+    docker:
+      - image: golang:1.17
+    working_directory: /go/src/github.com/skpr/ cloudfront-invalidation-metrics
+    steps:
+      - checkout
+      - run: go fmt ./...
+  lint:
+    docker:
+      - image: golang:1.17
+    working_directory: /go/src/github.com/skpr/ cloudfront-invalidation-metrics
+    steps:
+      - checkout
+      - run: |
+          go get golang.org/x/lint/golint
+          golint -set_exit_status `go list ./... | grep -v /vendor/`
+  vet:
+    docker:
+      - image: golang:1.17
+    working_directory: /go/src/github.com/skpr/ cloudfront-invalidation-metrics
+    steps:
+      - checkout
+      - run: go vet ./...
