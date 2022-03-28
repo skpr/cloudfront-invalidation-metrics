@@ -22,14 +22,14 @@ jobs:
   fmt:
     docker:
       - image: golang:1.17
-    working_directory: /go/src/github.com/skpr/ cloudfront-invalidation-metrics
+    working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
       - checkout
       - run: go fmt ./...
   lint:
     docker:
       - image: golang:1.17
-    working_directory: /go/src/github.com/skpr/ cloudfront-invalidation-metrics
+    working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
       - checkout
       - run: |
