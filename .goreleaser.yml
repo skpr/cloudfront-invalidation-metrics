@@ -25,7 +25,7 @@ archives:
     builds: [cloudfront-invalidation-metrics]
     format: zip
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    wrap_in_directory: true
+    wrap_in_directory: false
     files:
       - LICENSE
       - README.md
