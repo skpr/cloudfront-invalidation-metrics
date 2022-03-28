@@ -38,7 +38,15 @@ jobs:
   vet:
     docker:
       - image: golang:1.17
-    working_directory: /go/src/github.com/skpr/ cloudfront-invalidation-metrics
+    working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
       - checkout
       - run: go vet ./...
+
+  release:
+    docker:
+      - image: docker.io/goreleaser/goreleaser:v0.174.2
+    working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
+    steps:
+      - checkout
+      - run: goreleaser
