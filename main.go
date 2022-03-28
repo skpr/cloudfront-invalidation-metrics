@@ -33,6 +33,7 @@ type ErrorData struct {
 	Time         time.Time `json:"time"`
 }
 
+// LambdaApp is the Lambda construct with any configuration.
 type LambdaApp struct {
 	Params        Params
 	Distributions *cloudfront.ListDistributionsOutput
@@ -69,7 +70,7 @@ func (app *LambdaApp) getDistributions() *cloudfront.ListDistributionsOutput {
 }
 
 // getInvalidations will run all ListInvalidations actions and return the response.
-func (app *LambdaApp) getInvalidations(distribution string) (error, *cloudfront.ListInvalidationsOutput) {
+func (app *LambdaApp) getInvalidations(distribution string) (*cloudfront.ListInvalidationsOutput, error) {
 
 	printMessage("ListInvalidations", "", "Pending", distribution, "")
 
@@ -83,12 +84,12 @@ func (app *LambdaApp) getInvalidations(distribution string) (error, *cloudfront.
 	result, err := svc.ListInvalidations(context.TODO(), input)
 	if err != nil {
 		printMessage("ListInvalidations", "", "Error", "", "")
-		return err, &cloudfront.ListInvalidationsOutput{}
+		return &cloudfront.ListInvalidationsOutput{}, err
 	}
 
 	printMessage("ListInvalidations", "", "Success", "", "")
 
-	return nil, result
+	return result, nil
 }
 
 // prepareToPush will structure the data ready to send to CloudWatch.
@@ -146,11 +147,11 @@ func (app *LambdaApp) prepareToPush(distribution *cftypes.DistributionSummary, i
 			continue
 		}
 
-		if err := app.sendData(svc, &dataSet); err != nil {
+		if err := app.sendData(svc, &dataSet); err == nil {
+			printMessage("PutMetricData", "InvalidationRequest", "Success", *distribution.Id, "1")
+		} else {
 			printMessage("PutMetricData", "InvalidationRequest", "Error", *distribution.Id, "1")
 			return err
-		} else {
-			printMessage("PutMetricData", "InvalidationRequest", "Success", *distribution.Id, "1")
 		}
 	}
 
@@ -178,7 +179,7 @@ func (app *LambdaApp) sendInvalidationCount(distribution *cftypes.DistributionSu
 		})
 
 		if err := isTimeRangeAcceptable(invalidationDetail.Invalidation.CreateTime); err == nil {
-			pathCount += 1
+			pathCount++
 		} else {
 			continue
 		}
@@ -204,11 +205,11 @@ func (app *LambdaApp) sendInvalidationCount(distribution *cftypes.DistributionSu
 		return nil
 	}
 
-	if err := app.sendData(svc, &dataSet); err != nil {
+	if err := app.sendData(svc, &dataSet); err == nil {
+		printMessage("PutMetricData", "InvalidationPathCounter", "Success", *distribution.Id, fmt.Sprint(pathCount))
+	} else {
 		printMessage("PutMetricData", "InvalidationPathCounter", "Error", *distribution.Id, fmt.Sprint(pathCount))
 		return err
-	} else {
-		printMessage("PutMetricData", "InvalidationPathCounter", "Success", *distribution.Id, fmt.Sprint(pathCount))
 	}
 	return nil
 }
@@ -248,9 +249,7 @@ func StartLambda(app LambdaApp) error {
 	app.Distributions = app.getDistributions()
 	for _, distro := range app.Distributions.DistributionList.Items {
 		_ = app.sendInvalidationCount(&distro)
-		if err, invalidations := app.getInvalidations(*distro.Id); err != nil {
-			return err
-		} else {
+		if err, invalidations := app.getInvalidations(*distro.Id); err == nil {
 			if len(invalidations.InvalidationList.Items) > 0 {
 				if err := app.prepareToPush(&distro, invalidations); err != nil {
 					return err
@@ -258,6 +257,8 @@ func StartLambda(app LambdaApp) error {
 			} else {
 				printMessage("PutMetricData", "", "Warning", "", "")
 			}
+		} else {
+			return err
 		}
 	}
 	printMessage("", "Application completed", "Success", "", "")
