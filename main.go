@@ -247,7 +247,7 @@ func isTimeRangeAcceptable(timeSource *time.Time) error {
 func StartLambda(app LambdaApp) error {
 	app.Distributions = app.getDistributions()
 	for _, distro := range app.Distributions.DistributionList.Items {
-		app.sendInvalidationCount(&distro)
+		_ = app.sendInvalidationCount(&distro)
 		if err, invalidations := app.getInvalidations(*distro.Id); err != nil {
 			return err
 		} else {
