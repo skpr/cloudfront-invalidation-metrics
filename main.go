@@ -249,7 +249,7 @@ func StartLambda(app LambdaApp) error {
 	app.Distributions = app.getDistributions()
 	for _, distro := range app.Distributions.DistributionList.Items {
 		_ = app.sendInvalidationCount(&distro)
-		if err, invalidations := app.getInvalidations(*distro.Id); err == nil {
+		if invalidations, err := app.getInvalidations(*distro.Id); err == nil {
 			if len(invalidations.InvalidationList.Items) > 0 {
 				if err := app.prepareToPush(&distro, invalidations); err != nil {
 					return err
