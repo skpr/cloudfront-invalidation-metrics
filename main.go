@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-lambda-go/lambda"
 	"strings"
 	"time"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -62,7 +62,7 @@ func (app *LambdaApp) getDistributions() *cloudfront.ListDistributionsOutput {
 
 	result, err := svc.ListDistributions(context.TODO(), &cloudfront.ListDistributionsInput{})
 	if err != nil {
-		printMessage("ListDistributions", "", "Error", "", "")
+		printMessage("ListDistributions", err.Error(), "Error", "", "")
 		return &cloudfront.ListDistributionsOutput{}
 	}
 	printMessage("ListDistributions", "", "Success", "", "")
@@ -83,7 +83,7 @@ func (app *LambdaApp) getInvalidations(distribution string) (*cloudfront.ListInv
 
 	result, err := svc.ListInvalidations(context.TODO(), input)
 	if err != nil {
-		printMessage("ListInvalidations", "", "Error", "", "")
+		printMessage("ListInvalidations", err.Error(), "Error", "", "")
 		return &cloudfront.ListInvalidationsOutput{}, err
 	}
 
@@ -150,7 +150,7 @@ func (app *LambdaApp) prepareToPush(distribution *cftypes.DistributionSummary, i
 		if err := app.sendData(svc, &dataSet); err == nil {
 			printMessage("PutMetricData", "InvalidationRequest", "Success", *distribution.Id, "1")
 		} else {
-			printMessage("PutMetricData", "InvalidationRequest", "Error", *distribution.Id, "1")
+			printMessage("PutMetricData", err.Error(), "Error", *distribution.Id, "1")
 			return err
 		}
 	}
