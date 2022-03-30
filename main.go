@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-lambda-go/lambda"
+	"os"
 	"time"
 
-	"github.com/aws/aws-lambda-go/lambda"
+	//"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -18,21 +20,17 @@ const (
 	CloudWatchNamespace = "Skpr/CloudFront"
 )
 
-// StartLambda is an exported abstraction so that the application
+type clients struct {
+	CloudFront *cloudfront.Client `json:"cloudfront"`
+	CloudWatch *cloudwatch.Client `json:"cloudwatch"`
+}
+
+// Lambda is an exported abstraction so that the application
 // can be used externally from Skpr or Lambda by writing your own
 // main function which calls this.
-func StartLambda(ctx context.Context) error {
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get AWS client config: %w", err)
-	}
+func Lambda(ctx context.Context, clients clients) error {
 
-	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
-	clientCloudFront := cloudfront.NewFromConfig(cfg)
-
-	// @todo, Run a function that passes context and these clients (interfaces ftw).
-
-	distributions, err := clientCloudFront.ListDistributions(context.TODO(), &cloudfront.ListDistributionsInput{})
+	distributions, err := clients.CloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
 	}
@@ -40,21 +38,20 @@ func StartLambda(ctx context.Context) error {
 	var data []cwtypes.MetricDatum
 
 	for _, distribution := range distributions.DistributionList.Items {
-		invalidations, err := clientCloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
+		invalidations, err := clients.CloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
 			DistributionId: distribution.Id,
-			// @todo, Descending order + break once past 5 minutes????
 		})
 		if err != nil {
 			return err
 		}
 
 		var (
-			countInvalidations = 0
-			countPaths         = 0
+			countInvalidations float64
+			countPaths         float64
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
-			invalidationDetail, _ := clientCloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
+			invalidationDetail, _ := clients.CloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
 				DistributionId: distribution.Id,
 				Id:             invalidation.Id,
 			})
@@ -65,19 +62,25 @@ func StartLambda(ctx context.Context) error {
 			}
 
 			if !acceptable {
-				// @todo, Consider break?
-				continue
+				break
 			}
 
 			countInvalidations++
 
-			countPaths = countPaths + *invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity
+			countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
+		}
+
+		// 20 item limit per payload, if the limit is met or exceeded, offload now.
+		if len(data) >= 20 {
+			if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
+				fmt.Errorf(err.Error())
+			}
 		}
 
 		data = append(data, cwtypes.MetricDatum{
 			MetricName: aws.String("InvalidationRequest"),
 			Unit:       cwtypes.StandardUnitCount,
-			Value:      aws.Float64(1),
+			Value:      aws.Float64(countInvalidations),
 			Timestamp:  aws.Time(time.Now()),
 			Dimensions: []cwtypes.Dimension{
 				{
@@ -90,7 +93,7 @@ func StartLambda(ctx context.Context) error {
 		data = append(data, cwtypes.MetricDatum{
 			MetricName: aws.String("InvalidationPathCounter"),
 			Unit:       cwtypes.StandardUnitCount,
-			Value:      aws.Float64(1),
+			Value:      aws.Float64(countPaths),
 			Timestamp:  aws.Time(time.Now()),
 			Dimensions: []cwtypes.Dimension{
 				{
@@ -101,18 +104,30 @@ func StartLambda(ctx context.Context) error {
 		})
 	}
 
-	// @todo, Determine if we need to account for limits.
-
-	_, err = clientCloudWatch.PutMetricData(context.TODO(), &cloudwatch.PutMetricDataInput{
-		Namespace:  aws.String(CloudWatchNamespace),
-		MetricData: data,
-	})
+	if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
+		fmt.Errorf(err.Error())
+	}
 
 	return nil
 }
 
-func main() {
-	lambda.Start(StartLambda)
+// pushMetrics will push the metrics found in the input and return the error from that.
+// It will also empty out the data if completed successfully so that the variable can
+// be repopulated as needed.
+func pushMetrics(ctx context.Context, clientCloudWatch *cloudwatch.Client, data *[]cwtypes.MetricDatum) error {
+	if dryrun := os.Getenv("LAMBDA_DRYRUN"); dryrun != "" {
+		return nil
+	}
+	_, err := clientCloudWatch.PutMetricData(ctx, &cloudwatch.PutMetricDataInput{
+		Namespace:  aws.String(CloudWatchNamespace),
+		MetricData: *data,
+	})
+	// If no error was found, remove the data from memory.
+	// This is so that more can be re-queued if necessary.
+	if err == nil {
+		data = &[]cwtypes.MetricDatum{}
+	}
+	return err
 }
 
 // isTimeRangeAcceptable will determine if an input time is within
@@ -131,4 +146,21 @@ func isTimeRangeAcceptable(timeSource *time.Time) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func main() {
+
+	ctx := context.Background()
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		fmt.Errorf("failed to get AWS client config: %w", err)
+	}
+
+	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
+	clientCloudFront := cloudfront.NewFromConfig(cfg)
+
+	lambda.Start(Lambda(ctx, clients{
+		CloudFront: clientCloudFront,
+		CloudWatch: clientCloudWatch,
+	}))
 }
