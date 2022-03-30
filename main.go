@@ -73,7 +73,7 @@ func Lambda(ctx context.Context, clients clients) error {
 		// 20 item limit per payload, if the limit is met or exceeded, offload now.
 		if len(data) >= 20 {
 			if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
-				fmt.Errorf(err.Error())
+				return fmt.Errorf(err.Error())
 			}
 		}
 
@@ -105,7 +105,7 @@ func Lambda(ctx context.Context, clients clients) error {
 	}
 
 	if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
-		fmt.Errorf(err.Error())
+		return fmt.Errorf(err.Error())
 	}
 
 	return nil
@@ -125,7 +125,7 @@ func pushMetrics(ctx context.Context, clientCloudWatch *cloudwatch.Client, data 
 	// If no error was found, remove the data from memory.
 	// This is so that more can be re-queued if necessary.
 	if err == nil {
-		data = &[]cwtypes.MetricDatum{}
+		*data = []cwtypes.MetricDatum{}
 	}
 	return err
 }
@@ -153,7 +153,7 @@ func main() {
 	ctx := context.Background()
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		fmt.Errorf("failed to get AWS client config: %w", err)
+		fmt.Printf("failed to get AWS client config: %s\n", err.Error())
 	}
 
 	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
