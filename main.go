@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	// CloudWatchNamespace is the CloudWatch Namespace to store metrics in.
 	CloudWatchNamespace = "Skpr/CloudFront"
 )
 
