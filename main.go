@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/aws/aws-lambda-go/lambda"
 	"time"
 
-	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -49,6 +49,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 		Client:    clientCloudWatch,
 		Namespace: CloudWatchNamespace,
 	}
+	defer dataQueue.Flush()
 
 	for _, distribution := range distributions.DistributionList.Items {
 		invalidations, err := clientCloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
@@ -64,6 +65,15 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
+
+			acceptable, err := IsTimeRangeAcceptable("", invalidation.CreateTime)
+			if err != nil {
+				continue
+			}
+			if acceptable {
+				countInvalidations++
+			}
+
 			invalidationDetail, _ := clientCloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
 				DistributionId: distribution.Id,
 				Id:             invalidation.Id,
@@ -79,10 +89,11 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 					break
 				}
 
-				countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
-			}
+				if acceptable {
+					countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
+				}
 
-			countInvalidations++
+			}
 		}
 
 		data = append(data, cwtypes.MetricDatum{
