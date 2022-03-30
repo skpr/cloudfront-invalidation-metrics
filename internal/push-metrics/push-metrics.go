@@ -25,8 +25,10 @@ type Queue struct {
 
 func (Queue *Queue) Add(data cwtypes.MetricDatum) error {
 	if len(Queue.Data) < AwsPayloadLimit {
-		Queue.QueueFull = false
 		Queue.Data = append(Queue.Data, data)
+		if len(Queue.Data) == AwsPayloadLimit {
+			Queue.QueueFull = true
+		}
 	} else {
 		Queue.QueueFull = true
 		return fmt.Errorf("error adding to queue: queue size is full")
@@ -35,19 +37,18 @@ func (Queue *Queue) Add(data cwtypes.MetricDatum) error {
 	return nil
 }
 
-func (Queue *Queue) Flush() ([]cwtypes.MetricDatum, error) {
+func (Queue *Queue) Flush() error {
 	if dryrun := os.Getenv("METRICS_PUSH_DRYRUN"); dryrun != "" {
-		return Queue.Data, nil
+		return nil
 	}
 
-	_, err := Queue.Client.PutMetricData(context.Background(), &cloudwatch.PutMetricDataInput{
+	_, _ = Queue.Client.PutMetricData(context.Background(), &cloudwatch.PutMetricDataInput{
 		Namespace:  aws.String(Queue.Namespace),
 		MetricData: Queue.Data,
 	})
 
-	if err != nil {
-		return Queue.Data, fmt.Errorf(err.Error())
-	}
+	Queue.Data = []cwtypes.MetricDatum{}
+	Queue.QueueFull = len(Queue.Data) == AwsPayloadLimit
 
-	return []cwtypes.MetricDatum{}, nil
+	return nil
 }

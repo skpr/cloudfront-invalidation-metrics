@@ -7,39 +7,36 @@ import (
 	"testing"
 )
 
-var queue = &Queue{
-	Client:    cloudwatch.Client{},
-	Namespace: "dev/null",
-	QueueFull: false,
+func populateTestData(queue *Queue) {
+	for len(queue.Data) < AwsPayloadLimit {
+		_ = queue.Add(cwtypes.MetricDatum{
+			MetricName: aws.String("TestResponse"),
+			Value:      aws.Float64(1),
+		})
+	}
 }
 
 func TestAdd(t *testing.T) {
+
+	var queue = &Queue{
+		Client:    cloudwatch.Client{},
+		Namespace: "dev/null",
+		QueueFull: false,
+	}
 
 	if len(queue.Data) != 0 {
 		t.FailNow()
 	}
 
-	for len(queue.Data) < AwsPayloadLimit {
-		err := queue.Add(cwtypes.MetricDatum{
-			MetricName: aws.String("TestResponse"),
-			Value:      aws.Float64(1),
-		})
-		if err != nil {
-			t.FailNow()
-		}
-	}
+	populateTestData(queue)
 	if len(queue.Data) != AwsPayloadLimit {
 		t.FailNow()
 	}
 
-	err := queue.Add(cwtypes.MetricDatum{
+	_ = queue.Add(cwtypes.MetricDatum{
 		MetricName: aws.String("TestResponse"),
 		Value:      aws.Float64(1),
 	})
-
-	if err == nil {
-		t.FailNow()
-	}
 
 	if len(queue.Data) > AwsPayloadLimit {
 		t.FailNow()
@@ -52,18 +49,28 @@ func TestAdd(t *testing.T) {
 }
 func TestFlush(t *testing.T) {
 
+	var queue = &Queue{
+		Client:    cloudwatch.Client{},
+		Namespace: "dev/null",
+		QueueFull: false,
+	}
+
+	populateTestData(queue)
 	if len(queue.Data) != AwsPayloadLimit {
 		t.FailNow()
 	}
 
-	// Expecting a failure here for now.
-	data, err := queue.Flush()
-
-	if err == nil {
+	if !queue.QueueFull {
 		t.FailNow()
 	}
 
-	if len(data) != AwsPayloadLimit {
+	queue.Flush()
+
+	if queue.QueueFull {
+		t.FailNow()
+	}
+
+	if len(queue.Data) != 0 {
 		t.FailNow()
 	}
 

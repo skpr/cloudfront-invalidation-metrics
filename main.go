@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/aws/aws-lambda-go/lambda"
 	"time"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -49,7 +49,6 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 		Client:    clientCloudWatch,
 		Namespace: CloudWatchNamespace,
 	}
-	defer dataQueue.Flush()
 
 	for _, distribution := range distributions.DistributionList.Items {
 		invalidations, err := clientCloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
@@ -66,10 +65,11 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
 
-			acceptable, err := IsTimeRangeAcceptable("", invalidation.CreateTime)
+			acceptable, err := IsTimeRangeAcceptable(time.Now(), *invalidation.CreateTime)
 			if err != nil {
 				continue
 			}
+
 			if acceptable {
 				countInvalidations++
 			}
@@ -80,7 +80,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 			})
 
 			if invalidationDetail != nil {
-				acceptable, err := IsTimeRangeAcceptable("", invalidationDetail.Invalidation.CreateTime)
+				acceptable, err := IsTimeRangeAcceptable(time.Now(), *invalidationDetail.Invalidation.CreateTime)
 				if err != nil {
 					continue
 				}
@@ -132,22 +132,22 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 		}
 	}
 
+	_ = dataQueue.Flush()
+
 	return nil
 }
 
 // IsTimeRangeAcceptable will determine if an input time is within
 // a given date range. It's intended here to be a frequency of every
 // five minutes.
-func IsTimeRangeAcceptable(format string, timeSource *time.Time) (bool, error) {
-	if format == "" {
-		format = "2006-01-02 15:04:05 +0000 UTC"
-	}
+func IsTimeRangeAcceptable(timeBaseline time.Time, timeSource time.Time) (bool, error) {
+	format := "2006-01-02 15:04:05 +0000 UTC"
 	timestamp, err := time.Parse(format, fmt.Sprint(timeSource))
 	if err != nil {
 		return false, err
 	}
 
-	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
+	fiveMinutesAgo := timeBaseline.Add(time.Minute * -5)
 	if timestamp.Before(fiveMinutesAgo) {
 		return false, fmt.Errorf("input time exceeds constraints")
 	}

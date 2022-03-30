@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// TestStart will test the Start function for a nil value completion.
 func TestStart(t *testing.T) {
 	err := Start()
 	if err == nil {
@@ -13,6 +14,7 @@ func TestStart(t *testing.T) {
 	}
 }
 
+// TestExecute tests the guts of the Lambda.
 func TestExecute(t *testing.T) {
 	err := os.Setenv("METRICS_PUSH_DRYRUN", "TRUE")
 	if err != nil {
@@ -25,29 +27,20 @@ func TestExecute(t *testing.T) {
 	}
 }
 
-//func TestExecute(t *testing.T) {}
+// TestIsTimeRangeAcceptable will test if a given input will return a positive
+// or negative response from the IsTimeRangeAcceptable function. This regulates
+// a specific timeframe around what metrics should be ingested.
 func TestIsTimeRangeAcceptable(t *testing.T) {
-	// todo fix time format differences.
-	var err error
-	format := "2006-01-02 15:04:05 +0000 UTC"
+	baselineFormat, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", "2006-01-02 15:04:05 +0000 UTC")
+	sourceFormat, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", "2006-01-02 15:04:05 +0000 UTC")
 
-	testTimeOne, err := time.Parse(format, time.Now().Format(time.RFC3339))
-	if err != nil {
+	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Minute*-2)); !outcome {
+		t.FailNow()
 	}
-	testTimeTwo, err := time.Parse(format, time.Now().Add(time.Minute*-5).Format(time.RFC3339))
-	if err != nil {
+	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Hour*-2)); outcome {
+		t.FailNow()
 	}
-	testTimeThree, err := time.Parse(format, time.Now().Add(time.Hour*-1).Format(time.RFC3339))
-	if err != nil {
-	}
-
-	_, err = IsTimeRangeAcceptable(time.RFC3339, &testTimeOne)
-	if err != nil {
-	}
-	_, err = IsTimeRangeAcceptable(time.RFC3339, &testTimeTwo)
-	if err != nil {
-	}
-	_, err = IsTimeRangeAcceptable(time.RFC3339, &testTimeThree)
-	if err == nil {
+	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Hour*-24)); outcome {
+		t.FailNow()
 	}
 }
