@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-lambda-go/lambda"
 	"os"
 	"time"
 
-	//"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
@@ -29,9 +28,18 @@ type clients struct {
 // Lambda is an exported abstraction so that the application
 // can be used externally from Skpr or Lambda by writing your own
 // main function which calls this.
-func Lambda(ctx context.Context, clients clients) error {
+func Lambda() error {
 
-	distributions, err := clients.CloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
+	ctx := context.Background()
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		fmt.Printf("failed to get AWS client config: %s\n", err.Error())
+	}
+
+	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
+	clientCloudFront := cloudfront.NewFromConfig(cfg)
+
+	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
 	}
@@ -39,7 +47,7 @@ func Lambda(ctx context.Context, clients clients) error {
 	var data []cwtypes.MetricDatum
 
 	for _, distribution := range distributions.DistributionList.Items {
-		invalidations, err := clients.CloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
+		invalidations, err := clientCloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
 			DistributionId: distribution.Id,
 		})
 		if err != nil {
@@ -52,28 +60,30 @@ func Lambda(ctx context.Context, clients clients) error {
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
-			invalidationDetail, _ := clients.CloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
+			invalidationDetail, _ := clientCloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
 				DistributionId: distribution.Id,
 				Id:             invalidation.Id,
 			})
 
-			acceptable, err := isTimeRangeAcceptable(invalidationDetail.Invalidation.CreateTime)
-			if err != nil {
-				return err
-			}
+			if invalidationDetail != nil {
+				acceptable, err := isTimeRangeAcceptable(invalidationDetail.Invalidation.CreateTime)
+				if err != nil {
+					return err
+				}
 
-			if !acceptable {
-				break
+				if !acceptable {
+					break
+				}
+
+				countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
 			}
 
 			countInvalidations++
-
-			countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
 		}
 
 		// 20 item limit per payload, if the limit is met or exceeded, offload now.
 		if len(data) >= 20 {
-			if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
+			if err = pushMetrics(ctx, clientCloudWatch, &data); err != nil {
 				return fmt.Errorf(err.Error())
 			}
 		}
@@ -105,7 +115,7 @@ func Lambda(ctx context.Context, clients clients) error {
 		})
 	}
 
-	if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
+	if err = pushMetrics(ctx, clientCloudWatch, &data); err != nil {
 		return fmt.Errorf(err.Error())
 	}
 
@@ -151,17 +161,6 @@ func isTimeRangeAcceptable(timeSource *time.Time) (bool, error) {
 
 func main() {
 
-	ctx := context.Background()
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		fmt.Printf("failed to get AWS client config: %s\n", err.Error())
-	}
+	lambda.Start(Lambda)
 
-	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
-	clientCloudFront := cloudfront.NewFromConfig(cfg)
-
-	lambda.Start(Lambda(ctx, clients{
-		CloudFront: clientCloudFront,
-		CloudWatch: clientCloudWatch,
-	}))
 }
