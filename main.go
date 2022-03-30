@@ -20,11 +20,6 @@ const (
 	CloudWatchNamespace = "Skpr/CloudFront"
 )
 
-type clients struct {
-	CloudFront *cloudfront.Client `json:"cloudfront"`
-	CloudWatch *cloudwatch.Client `json:"cloudwatch"`
-}
-
 // Lambda is an exported abstraction so that the application
 // can be used externally from Skpr or Lambda by writing your own
 // main function which calls this.
