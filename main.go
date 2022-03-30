@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -13,6 +11,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+
+	"cloudfront-invalidation-metrics/internal/push-metrics"
 )
 
 const (
@@ -20,10 +20,10 @@ const (
 	CloudWatchNamespace = "Skpr/CloudFront"
 )
 
-// Lambda is an exported abstraction so that the application
-// can be used externally from Skpr or Lambda by writing your own
-// main function which calls this.
-func Lambda() error {
+// Start is an exported abstraction so that the application can be
+// setup in a way that works for you, opposed to being a tightly
+// coupled to provided and assumed Clients.
+func Start() error {
 
 	ctx := context.Background()
 	cfg, err := config.LoadDefaultConfig(ctx)
@@ -34,12 +34,21 @@ func Lambda() error {
 	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
 	clientCloudFront := cloudfront.NewFromConfig(cfg)
 
+	return Execute(ctx, *clientCloudFront, *clientCloudWatch)
+}
+
+// Execute will execute the given API calls against the input Clients.
+func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientCloudWatch cloudwatch.Client) error {
 	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
 	}
 
 	var data []cwtypes.MetricDatum
+	dataQueue := push_metrics.Queue{
+		Client:    clientCloudWatch,
+		Namespace: CloudWatchNamespace,
+	}
 
 	for _, distribution := range distributions.DistributionList.Items {
 		invalidations, err := clientCloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
@@ -61,9 +70,9 @@ func Lambda() error {
 			})
 
 			if invalidationDetail != nil {
-				acceptable, err := isTimeRangeAcceptable(invalidationDetail.Invalidation.CreateTime)
+				acceptable, err := IsTimeRangeAcceptable("", invalidationDetail.Invalidation.CreateTime)
 				if err != nil {
-					return err
+					continue
 				}
 
 				if !acceptable {
@@ -74,13 +83,6 @@ func Lambda() error {
 			}
 
 			countInvalidations++
-		}
-
-		// 20 item limit per payload, if the limit is met or exceeded, offload now.
-		if len(data) >= 20 {
-			if err = pushMetrics(ctx, clientCloudWatch, &data); err != nil {
-				return fmt.Errorf(err.Error())
-			}
 		}
 
 		data = append(data, cwtypes.MetricDatum{
@@ -110,37 +112,25 @@ func Lambda() error {
 		})
 	}
 
-	if err = pushMetrics(ctx, clientCloudWatch, &data); err != nil {
-		return fmt.Errorf(err.Error())
+	for _, queueItem := range data {
+		if dataQueue.QueueFull {
+			dataQueue.Flush()
+		}
+		if err = dataQueue.Add(queueItem); err != nil {
+			return fmt.Errorf(err.Error())
+		}
 	}
 
 	return nil
 }
 
-// pushMetrics will push the metrics found in the input and return the error from that.
-// It will also empty out the data if completed successfully so that the variable can
-// be repopulated as needed.
-func pushMetrics(ctx context.Context, clientCloudWatch *cloudwatch.Client, data *[]cwtypes.MetricDatum) error {
-	if dryrun := os.Getenv("LAMBDA_DRYRUN"); dryrun != "" {
-		return nil
-	}
-	_, err := clientCloudWatch.PutMetricData(ctx, &cloudwatch.PutMetricDataInput{
-		Namespace:  aws.String(CloudWatchNamespace),
-		MetricData: *data,
-	})
-	// If no error was found, remove the data from memory.
-	// This is so that more can be re-queued if necessary.
-	if err == nil {
-		*data = []cwtypes.MetricDatum{}
-	}
-	return err
-}
-
-// isTimeRangeAcceptable will determine if an input time is within
+// IsTimeRangeAcceptable will determine if an input time is within
 // a given date range. It's intended here to be a frequency of every
 // five minutes.
-func isTimeRangeAcceptable(timeSource *time.Time) (bool, error) {
-	format := "2006-01-02 15:04:05 +0000 UTC"
+func IsTimeRangeAcceptable(format string, timeSource *time.Time) (bool, error) {
+	if format == "" {
+		format = "2006-01-02 15:04:05 +0000 UTC"
+	}
 	timestamp, err := time.Parse(format, fmt.Sprint(timeSource))
 	if err != nil {
 		return false, err
@@ -148,7 +138,7 @@ func isTimeRangeAcceptable(timeSource *time.Time) (bool, error) {
 
 	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
 	if timestamp.Before(fiveMinutesAgo) {
-		return false, errors.New("input time exceeds constraints")
+		return false, fmt.Errorf("input time exceeds constraints")
 	}
 
 	return true, nil
@@ -156,6 +146,6 @@ func isTimeRangeAcceptable(timeSource *time.Time) (bool, error) {
 
 func main() {
 
-	lambda.Start(Lambda)
+	lambda.Start(Start)
 
 }
