@@ -1,10 +1,11 @@
 package push_metrics
 
 import (
+	"testing"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-	"github.com/aws/aws-sdk-go/aws"
-	"testing"
 )
 
 func populateTestData(queue *Queue) {

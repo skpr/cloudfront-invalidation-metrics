@@ -40,12 +40,15 @@ func (Queue *Queue) Add(data cwtypes.MetricDatum) error {
 func (Queue *Queue) Flush() error {
 	if dryrun := os.Getenv("METRICS_PUSH_DRYRUN"); dryrun != "" {
 		return nil
+	} else {
+		_, err := Queue.Client.PutMetricData(context.Background(), &cloudwatch.PutMetricDataInput{
+			Namespace:  aws.String(Queue.Namespace),
+			MetricData: Queue.Data,
+		})
+		if err != nil {
+			return err
+		}
 	}
-
-	_, _ = Queue.Client.PutMetricData(context.Background(), &cloudwatch.PutMetricDataInput{
-		Namespace:  aws.String(Queue.Namespace),
-		MetricData: Queue.Data,
-	})
 
 	Queue.Data = []cwtypes.MetricDatum{}
 	Queue.QueueFull = len(Queue.Data) == AwsPayloadLimit
