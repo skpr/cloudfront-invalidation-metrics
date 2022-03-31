@@ -17,10 +17,16 @@ const (
 )
 
 type Queue struct {
+	QueueInterface
 	Client    cloudwatch.Client     `json:"client"`
 	Namespace string                `json:"namespace"`
 	QueueFull bool                  `json:"full"`
 	Data      []cwtypes.MetricDatum `json:"data"`
+}
+
+type QueueInterface interface {
+	Add(datum cwtypes.MetricDatum) error
+	Flush() error
 }
 
 func (Queue *Queue) Add(data cwtypes.MetricDatum) error {
@@ -38,20 +44,17 @@ func (Queue *Queue) Add(data cwtypes.MetricDatum) error {
 }
 
 func (Queue *Queue) Flush() error {
+	var err error
 	if dryrun := os.Getenv("METRICS_PUSH_DRYRUN"); dryrun != "" {
 		return nil
-	} else {
-		_, err := Queue.Client.PutMetricData(context.Background(), &cloudwatch.PutMetricDataInput{
-			Namespace:  aws.String(Queue.Namespace),
-			MetricData: Queue.Data,
-		})
-		if err != nil {
-			return err
-		}
 	}
+	_, err = Queue.Client.PutMetricData(context.Background(), &cloudwatch.PutMetricDataInput{
+		Namespace:  aws.String(Queue.Namespace),
+		MetricData: Queue.Data,
+	})
 
 	Queue.Data = []cwtypes.MetricDatum{}
 	Queue.QueueFull = len(Queue.Data) == AwsPayloadLimit
 
-	return nil
+	return err
 }
