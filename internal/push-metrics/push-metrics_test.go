@@ -5,12 +5,12 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 )
 
 func populateTestData(queue *Queue) {
 	for len(queue.Data) < AwsPayloadLimit {
-		_ = queue.Add(cwtypes.MetricDatum{
+		_ = queue.Add(types.MetricDatum{
 			MetricName: aws.String("TestResponse"),
 			Value:      aws.Float64(1),
 		})
@@ -34,7 +34,7 @@ func TestAdd(t *testing.T) {
 		t.FailNow()
 	}
 
-	_ = queue.Add(cwtypes.MetricDatum{
+	_ = queue.Add(types.MetricDatum{
 		MetricName: aws.String("TestResponse"),
 		Value:      aws.Float64(1),
 	})

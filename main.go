@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
 	"cloudfront-invalidation-metrics/internal/push-metrics"
 )
@@ -44,7 +44,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
 	}
 
-	var data []cwtypes.MetricDatum
+	var data []types.MetricDatum
 	dataQueue := push_metrics.Queue{
 		Client:    clientCloudWatch,
 		Namespace: CloudWatchNamespace,
@@ -96,12 +96,12 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 			}
 		}
 
-		data = append(data, cwtypes.MetricDatum{
+		data = append(data, types.MetricDatum{
 			MetricName: aws.String("InvalidationRequest"),
-			Unit:       cwtypes.StandardUnitCount,
+			Unit:       types.StandardUnitCount,
 			Value:      aws.Float64(countInvalidations),
 			Timestamp:  aws.Time(time.Now()),
-			Dimensions: []cwtypes.Dimension{
+			Dimensions: []types.Dimension{
 				{
 					Name:  aws.String("Distribution"),
 					Value: aws.String(*distribution.Id),
@@ -109,12 +109,12 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 			},
 		})
 
-		data = append(data, cwtypes.MetricDatum{
+		data = append(data, types.MetricDatum{
 			MetricName: aws.String("InvalidationPathCounter"),
-			Unit:       cwtypes.StandardUnitCount,
+			Unit:       types.StandardUnitCount,
 			Value:      aws.Float64(countPaths),
 			Timestamp:  aws.Time(time.Now()),
-			Dimensions: []cwtypes.Dimension{
+			Dimensions: []types.Dimension{
 				{
 					Name:  aws.String("Distribution"),
 					Value: aws.String(*distribution.Id),

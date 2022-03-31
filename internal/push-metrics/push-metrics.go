@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 )
 
 const (
@@ -18,18 +18,18 @@ const (
 
 type Queue struct {
 	QueueInterface
-	Client    cloudwatch.Client     `json:"client"`
-	Namespace string                `json:"namespace"`
-	QueueFull bool                  `json:"full"`
-	Data      []cwtypes.MetricDatum `json:"data"`
+	Client    cloudwatch.Client   `json:"client"`
+	Namespace string              `json:"namespace"`
+	QueueFull bool                `json:"full"`
+	Data      []types.MetricDatum `json:"data"`
 }
 
 type QueueInterface interface {
-	Add(datum cwtypes.MetricDatum) error
+	Add(datum types.MetricDatum) error
 	Flush() error
 }
 
-func (Queue *Queue) Add(data cwtypes.MetricDatum) error {
+func (Queue *Queue) Add(data types.MetricDatum) error {
 	if len(Queue.Data) < AwsPayloadLimit {
 		Queue.Data = append(Queue.Data, data)
 		if len(Queue.Data) == AwsPayloadLimit {
@@ -53,7 +53,7 @@ func (Queue *Queue) Flush() error {
 		MetricData: Queue.Data,
 	})
 
-	Queue.Data = []cwtypes.MetricDatum{}
+	Queue.Data = []types.MetricDatum{}
 	Queue.QueueFull = len(Queue.Data) == AwsPayloadLimit
 
 	return err
