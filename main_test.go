@@ -1,7 +1,9 @@
 package main
 
 import (
-	"os"
+	"cloudfront-invalidation-metrics/internal/mock/cloudfront"
+	"cloudfront-invalidation-metrics/internal/mock/cloudwatch"
+	"context"
 	"testing"
 	"time"
 )
@@ -16,12 +18,12 @@ func TestStart(t *testing.T) {
 
 // TestExecute tests the guts of the Lambda.
 func TestExecute(t *testing.T) {
-	err := os.Setenv("METRICS_PUSH_DRYRUN", "TRUE")
-	if err != nil {
-		t.FailNow()
-	}
+	ctx := context.Background()
+	cloudFrontClient := cloudfront.NewMockCloudFrontClient()
+	cloudWatchClient := cloudwatch.NewMockCloudwatchClient()
 
-	err = os.Setenv("METRICS_PUSH_DRYRUN", "")
+	// todo.... how?
+	err := Execute(ctx, *cloudFrontClient, *cloudWatchClient)
 	if err != nil {
 		t.FailNow()
 	}
@@ -34,12 +36,15 @@ func TestIsTimeRangeAcceptable(t *testing.T) {
 	baselineFormat, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", "2006-01-02 15:04:05 +0000 UTC")
 	sourceFormat, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", "2006-01-02 15:04:05 +0000 UTC")
 
+	// Time.Now() - 2 minutes should return true (not false)
 	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Minute*-2)); !outcome {
 		t.FailNow()
 	}
+	// Time.Now() - 2 hours should return false (not true)
 	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Hour*-2)); outcome {
 		t.FailNow()
 	}
+	// Time.Now() - 24 hours should return false (not true)
 	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Hour*-24)); outcome {
 		t.FailNow()
 	}
