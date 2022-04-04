@@ -26,7 +26,9 @@ jobs:
     working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
       - checkout
-      - run: go fmt ./...
+      - run: |
+          go mod vendor
+          go fmt ./...
   test:
     docker:
       - image: golang:1.18
@@ -34,7 +36,8 @@ jobs:
     steps:
       - checkout
       - run: |
-          `go test ./...`
+          go mod vendor
+          go test ./...
   lint:
     docker:
       - image: golang:1.18
@@ -42,6 +45,7 @@ jobs:
     steps:
       - checkout
       - run: |
+          go mod vendor
           go get golang.org/x/lint/golint
           golint -set_exit_status `go list ./... | grep -v /vendor/`
   vet:
@@ -49,8 +53,9 @@ jobs:
       - image: golang:1.18
     working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
-      - checkout
-      - run: go vet ./...
+      - run: |
+          go mod vendor
+          go vet ./...
 
   release:
     docker:
