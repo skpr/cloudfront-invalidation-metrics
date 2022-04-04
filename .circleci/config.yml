@@ -33,7 +33,7 @@ jobs:
     steps:
       - checkout
       - run: |
-          `go list ./... | grep -v /vendor/`
+          `go test ./...`
   lint:
     docker:
       - image: golang:1.17
