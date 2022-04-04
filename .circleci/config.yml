@@ -26,7 +26,7 @@ jobs:
     steps:
       - checkout
       - run: go fmt ./...
-  test:
+  run-tests:
     docker:
       - image: golang:1.17
     working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
