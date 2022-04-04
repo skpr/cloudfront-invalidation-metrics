@@ -45,9 +45,7 @@ jobs:
     steps:
       - checkout
       - run: |
-          go mod vendor
-          go get golang.org/x/lint/golint
-          golint -set_exit_status `go list ./... | grep -v /vendor/`
+          docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.45.2 golangci-lint run -v
   vet:
     docker:
       - image: golang:1.18
