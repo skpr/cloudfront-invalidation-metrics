@@ -49,7 +49,9 @@ jobs:
       - image: golang:1.18
     working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
+      - checkout
       - run: |
+          go mod vendor
           go vet ./...
 
   release:
