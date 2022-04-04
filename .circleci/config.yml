@@ -50,7 +50,6 @@ jobs:
     working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
       - run: |
-          go mod vendor
           go vet ./...
 
   release:
