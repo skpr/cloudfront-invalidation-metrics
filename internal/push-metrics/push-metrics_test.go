@@ -4,32 +4,30 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+
+	client "cloudfront-invalidation-metrics/internal/cloudwatch"
 )
 
-func populateTestData(queue *Queue) {
+// testSetupQueue will return a testable and functional queue.
+func testSetupQueue() *Queue {
+	var queue = &Queue{
+		Namespace: "dev/null",
+		QueueFull: false,
+	}
 	for len(queue.Data) < AwsPayloadLimit {
 		_ = queue.Add(types.MetricDatum{
 			MetricName: aws.String("TestResponse"),
 			Value:      aws.Float64(1),
 		})
 	}
+	return queue
 }
 
 func TestAdd(t *testing.T) {
 
-	var queue = &Queue{
-		Client:    cloudwatch.Client{},
-		Namespace: "dev/null",
-		QueueFull: false,
-	}
+	queue := testSetupQueue()
 
-	if len(queue.Data) != 0 {
-		t.FailNow()
-	}
-
-	populateTestData(queue)
 	if len(queue.Data) != AwsPayloadLimit {
 		t.FailNow()
 	}
@@ -50,13 +48,8 @@ func TestAdd(t *testing.T) {
 }
 func TestFlush(t *testing.T) {
 
-	var queue = &Queue{
-		Client:    cloudwatch.Client{},
-		Namespace: "dev/null",
-		QueueFull: false,
-	}
-
-	populateTestData(queue)
+	client := client.MockCloudWatchClient{}
+	queue := testSetupQueue()
 	if len(queue.Data) != AwsPayloadLimit {
 		t.FailNow()
 	}
@@ -65,8 +58,9 @@ func TestFlush(t *testing.T) {
 		t.FailNow()
 	}
 
-	queue.Flush()
-
+	t.Log(queue.QueueFull)
+	queue.Flush(client)
+	t.Log(queue.QueueFull)
 	if queue.QueueFull {
 		t.FailNow()
 	}

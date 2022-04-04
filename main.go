@@ -12,6 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
+	cloudfrontclient "cloudfront-invalidation-metrics/internal/cloudfront"
+	cloudwatchclient "cloudfront-invalidation-metrics/internal/cloudwatch"
 	"cloudfront-invalidation-metrics/internal/push-metrics"
 )
 
@@ -34,11 +36,11 @@ func Start() error {
 	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
 	clientCloudFront := cloudfront.NewFromConfig(cfg)
 
-	return Execute(ctx, *clientCloudFront, *clientCloudWatch)
+	return Execute(ctx, clientCloudFront, clientCloudWatch)
 }
 
 // Execute will execute the given API calls against the input Clients.
-func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientCloudWatch cloudwatch.Client) error {
+func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontClientInterface, clientCloudWatch cloudwatchclient.CloudWatchClientInterface) error {
 	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
@@ -46,7 +48,6 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 
 	var data []types.MetricDatum
 	dataQueue := push_metrics.Queue{
-		Client:    clientCloudWatch,
 		Namespace: CloudWatchNamespace,
 	}
 
@@ -125,16 +126,16 @@ func Execute(ctx context.Context, clientCloudFront cloudfront.Client, clientClou
 
 	for _, queueItem := range data {
 		if dataQueue.QueueFull {
-			dataQueue.Flush()
+			dataQueue.Flush(clientCloudWatch)
 		}
 		if err = dataQueue.Add(queueItem); err != nil {
 			return fmt.Errorf(err.Error())
 		}
 	}
 
-	_ = dataQueue.Flush()
+	err = dataQueue.Flush(clientCloudWatch)
 
-	return nil
+	return err
 }
 
 // IsTimeRangeAcceptable will determine if an input time is within

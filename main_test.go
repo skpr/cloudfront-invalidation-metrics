@@ -1,11 +1,12 @@
 package main
 
 import (
-	"cloudfront-invalidation-metrics/internal/mock/cloudfront"
-	"cloudfront-invalidation-metrics/internal/mock/cloudwatch"
 	"context"
 	"testing"
 	"time"
+
+	"cloudfront-invalidation-metrics/internal/cloudfront"
+	"cloudfront-invalidation-metrics/internal/cloudwatch"
 )
 
 // TestStart will test the Start function for a nil value completion.
@@ -19,11 +20,10 @@ func TestStart(t *testing.T) {
 // TestExecute tests the guts of the Lambda.
 func TestExecute(t *testing.T) {
 	ctx := context.Background()
-	cloudFrontClient := cloudfront.NewMockCloudFrontClient()
-	cloudWatchClient := cloudwatch.NewMockCloudwatchClient()
+	clientCloudFront := cloudfront.MockCloudFrontClient{}
+	clientCloudWatch := cloudwatch.MockCloudWatchClient{}
 
-	// todo.... how?
-	err := Execute(ctx, *cloudFrontClient, *cloudWatchClient)
+	err := Execute(ctx, clientCloudFront, clientCloudWatch)
 	if err != nil {
 		t.FailNow()
 	}
