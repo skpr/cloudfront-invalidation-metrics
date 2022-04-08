@@ -12,8 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
-	cloudfrontclient "cloudfront-invalidation-metrics/internal/cloudfront"
-	cloudwatchclient "cloudfront-invalidation-metrics/internal/cloudwatch"
+	cloudfrontclient "cloudfront-invalidation-metrics/internal/aws/cloudfront"
+	cloudwatchclient "cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 	push_metrics "cloudfront-invalidation-metrics/internal/push-metrics"
 )
 

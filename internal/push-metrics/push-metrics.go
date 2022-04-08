@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
-	cloudwatchclient "cloudfront-invalidation-metrics/internal/cloudwatch"
+	cloudwatchclient "cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 )
 
 const (
@@ -63,7 +63,7 @@ func (Queue *Queue) Flush(clientCLoudWatch cloudwatchclient.CloudWatchClientInte
 	if err == nil {
 		Queue.Data = []types.MetricDatum{}
 	}
-	
+
 	Queue.QueueFull = len(Queue.Data) == AwsPayloadLimit
 
 	return err
