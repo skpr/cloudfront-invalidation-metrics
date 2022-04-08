@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"cloudfront-invalidation-metrics/internal/cloudfront"
-	"cloudfront-invalidation-metrics/internal/cloudwatch"
+	"cloudfront-invalidation-metrics/internal/aws/cloudfront"
+	"cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 )
 
 // TestStart will test the Start function for a nil value completion.

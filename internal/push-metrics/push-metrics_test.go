@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
-	client "cloudfront-invalidation-metrics/internal/cloudwatch"
+	client "cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 )
 
 // testSetupQueue will return a testable and functional queue.
@@ -58,9 +58,7 @@ func TestFlush(t *testing.T) {
 		t.FailNow()
 	}
 
-	t.Log(queue.QueueFull)
 	queue.Flush(client)
-	t.Log(queue.QueueFull)
 	if queue.QueueFull {
 		t.FailNow()
 	}
