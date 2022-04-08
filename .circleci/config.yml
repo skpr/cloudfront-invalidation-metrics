@@ -6,6 +6,7 @@ workflows:
     jobs:
       - fmt
       - lint
+      - test
       - vet
   release:
     jobs:
@@ -21,27 +22,37 @@ workflows:
 jobs:
   fmt:
     docker:
-      - image: golang:1.17
-    working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
-    steps:
-      - checkout
-      - run: go fmt ./...
-  lint:
-    docker:
-      - image: golang:1.17
+      - image: golang:1.18
     working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
       - checkout
       - run: |
-          go get golang.org/x/lint/golint
-          golint -set_exit_status `go list ./... | grep -v /vendor/`
-  vet:
+          go mod vendor
+          go fmt ./...
+  test:
     docker:
-      - image: golang:1.17
+      - image: golang:1.18
     working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
     steps:
       - checkout
-      - run: go vet ./...
+      - run: |
+          go mod vendor
+          go test ./...
+  lint:
+    docker:
+      - image: golangci/golangci-lint:v1.45-alpine
+    steps:
+      - checkout
+      - run: golangci-lint run
+  vet:
+    docker:
+      - image: golang:1.18
+    working_directory: /go/src/github.com/skpr/cloudfront-invalidation-metrics
+    steps:
+      - checkout
+      - run: |
+          go mod vendor
+          go vet ./...
 
   release:
     docker:

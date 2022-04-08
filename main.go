@@ -2,18 +2,19 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/aws/aws-lambda-go/lambda"
-	"os"
 	"time"
 
-	//"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	cwtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+
+	cloudfrontclient "cloudfront-invalidation-metrics/internal/cloudfront"
+	cloudwatchclient "cloudfront-invalidation-metrics/internal/cloudwatch"
+	push_metrics "cloudfront-invalidation-metrics/internal/push-metrics"
 )
 
 const (
@@ -21,137 +22,10 @@ const (
 	CloudWatchNamespace = "Skpr/CloudFront"
 )
 
-type clients struct {
-	CloudFront *cloudfront.Client `json:"cloudfront"`
-	CloudWatch *cloudwatch.Client `json:"cloudwatch"`
-}
-
-// Lambda is an exported abstraction so that the application
-// can be used externally from Skpr or Lambda by writing your own
-// main function which calls this.
-func Lambda(ctx context.Context, clients clients) error {
-
-	distributions, err := clients.CloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
-	if err != nil {
-		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
-	}
-
-	var data []cwtypes.MetricDatum
-
-	for _, distribution := range distributions.DistributionList.Items {
-		invalidations, err := clients.CloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
-			DistributionId: distribution.Id,
-		})
-		if err != nil {
-			return err
-		}
-
-		var (
-			countInvalidations float64
-			countPaths         float64
-		)
-
-		for _, invalidation := range invalidations.InvalidationList.Items {
-			invalidationDetail, _ := clients.CloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
-				DistributionId: distribution.Id,
-				Id:             invalidation.Id,
-			})
-
-			acceptable, err := isTimeRangeAcceptable(invalidationDetail.Invalidation.CreateTime)
-			if err != nil {
-				return err
-			}
-
-			if !acceptable {
-				break
-			}
-
-			countInvalidations++
-
-			countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
-		}
-
-		// 20 item limit per payload, if the limit is met or exceeded, offload now.
-		if len(data) >= 20 {
-			if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
-				return fmt.Errorf(err.Error())
-			}
-		}
-
-		data = append(data, cwtypes.MetricDatum{
-			MetricName: aws.String("InvalidationRequest"),
-			Unit:       cwtypes.StandardUnitCount,
-			Value:      aws.Float64(countInvalidations),
-			Timestamp:  aws.Time(time.Now()),
-			Dimensions: []cwtypes.Dimension{
-				{
-					Name:  aws.String("Distribution"),
-					Value: aws.String(*distribution.Id),
-				},
-			},
-		})
-
-		data = append(data, cwtypes.MetricDatum{
-			MetricName: aws.String("InvalidationPathCounter"),
-			Unit:       cwtypes.StandardUnitCount,
-			Value:      aws.Float64(countPaths),
-			Timestamp:  aws.Time(time.Now()),
-			Dimensions: []cwtypes.Dimension{
-				{
-					Name:  aws.String("Distribution"),
-					Value: aws.String(*distribution.Id),
-				},
-			},
-		})
-	}
-
-	if err = pushMetrics(ctx, clients.CloudWatch, &data); err != nil {
-		return fmt.Errorf(err.Error())
-	}
-
-	return nil
-}
-
-// pushMetrics will push the metrics found in the input and return the error from that.
-// It will also empty out the data if completed successfully so that the variable can
-// be repopulated as needed.
-func pushMetrics(ctx context.Context, clientCloudWatch *cloudwatch.Client, data *[]cwtypes.MetricDatum) error {
-	if dryrun := os.Getenv("LAMBDA_DRYRUN"); dryrun != "" {
-		return nil
-	}
-	_, err := clientCloudWatch.PutMetricData(ctx, &cloudwatch.PutMetricDataInput{
-		Namespace:  aws.String(CloudWatchNamespace),
-		MetricData: *data,
-	})
-	// If no error was found, remove the data from memory.
-	// This is so that more can be re-queued if necessary.
-	if err == nil {
-		*data = []cwtypes.MetricDatum{}
-	}
-	return err
-}
-
-// isTimeRangeAcceptable will determine if an input time is within
-// a given date range. It's intended here to be a frequency of every
-// five minutes.
-func isTimeRangeAcceptable(timeSource *time.Time) (bool, error) {
-	format := "2006-01-02 15:04:05 +0000 UTC"
-	timestamp, err := time.Parse(format, fmt.Sprint(timeSource))
-	if err != nil {
-		return false, err
-	}
-
-	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
-	if timestamp.Before(fiveMinutesAgo) {
-		return false, errors.New("input time exceeds constraints")
-	}
-
-	return true, nil
-}
-
-func main() {
-
-	ctx := context.Background()
+// Start is an exported abstraction so that the application can be
+// setup in a way that works for you, opposed to being a tightly
+// coupled to provided and assumed Clients.
+func Start(ctx context.Context) error {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		fmt.Printf("failed to get AWS client config: %s\n", err.Error())
@@ -160,8 +34,113 @@ func main() {
 	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
 	clientCloudFront := cloudfront.NewFromConfig(cfg)
 
-	lambda.Start(Lambda(ctx, clients{
-		CloudFront: clientCloudFront,
-		CloudWatch: clientCloudWatch,
-	}))
+	return Execute(ctx, clientCloudFront, clientCloudWatch)
+}
+
+// Execute will execute the given API calls against the input Clients.
+func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontClientInterface, clientCloudWatch cloudwatchclient.CloudWatchClientInterface) error {
+	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
+	if err != nil {
+		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
+	}
+
+	var data []types.MetricDatum
+	dataQueue := push_metrics.Queue{
+		Namespace: CloudWatchNamespace,
+	}
+
+	for _, distribution := range distributions.DistributionList.Items {
+		invalidations, err := clientCloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
+			DistributionId: distribution.Id,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to list invalidations: %w", err)
+		}
+
+		var (
+			countInvalidations float64
+			countPaths         float64
+		)
+
+		for _, invalidation := range invalidations.InvalidationList.Items {
+			acceptable, err := IsTimeRangeAcceptable(*invalidation.CreateTime)
+			if err != nil {
+				return fmt.Errorf("invalidation is not in range: %w", err)
+			}
+
+			if acceptable {
+				countInvalidations++
+			}
+
+			invalidationDetail, err := clientCloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
+				DistributionId: distribution.Id,
+				Id:             invalidation.Id,
+			})
+			if err != nil {
+				return fmt.Errorf("failed to get invalidation detail: %w", err)
+			}
+
+			if invalidationDetail != nil {
+				if acceptable {
+					countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
+				}
+			}
+		}
+
+		data = append(data, types.MetricDatum{
+			MetricName: aws.String("InvalidationRequest"),
+			Unit:       types.StandardUnitCount,
+			Value:      aws.Float64(countInvalidations),
+			Timestamp:  aws.Time(time.Now()),
+			Dimensions: []types.Dimension{
+				{
+					Name:  aws.String("Distribution"),
+					Value: aws.String(*distribution.Id),
+				},
+			},
+		})
+
+		data = append(data, types.MetricDatum{
+			MetricName: aws.String("InvalidationPathCounter"),
+			Unit:       types.StandardUnitCount,
+			Value:      aws.Float64(countPaths),
+			Timestamp:  aws.Time(time.Now()),
+			Dimensions: []types.Dimension{
+				{
+					Name:  aws.String("Distribution"),
+					Value: aws.String(*distribution.Id),
+				},
+			},
+		})
+	}
+
+	for _, queueItem := range data {
+		if dataQueue.QueueFull {
+			dataQueue.Flush(clientCloudWatch)
+		}
+
+		if err = dataQueue.Add(queueItem); err != nil {
+			return fmt.Errorf(err.Error())
+		}
+	}
+
+	err = dataQueue.Flush(clientCloudWatch)
+
+	return err
+}
+
+// IsTimeRangeAcceptable will determine if an input time is within
+// a given date range. It's intended here to be a frequency of every
+// five minutes.
+func IsTimeRangeAcceptable(input time.Time) (bool, error) {
+	// Calculate what is the acceptable age of an invalidation to ingest.
+	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
+	if input.Before(fiveMinutesAgo) {
+		return false, fmt.Errorf("input time is not in a reportable time frame")
+	}
+	return true, nil
+}
+
+func main() {
+	lambda.Start(Start)
 }
