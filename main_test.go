@@ -11,7 +11,7 @@ import (
 
 // TestStart will test the Start function for a nil value completion.
 func TestStart(t *testing.T) {
-	err := Start()
+	err := Start(context.TODO())
 	if err == nil {
 		t.FailNow()
 	}

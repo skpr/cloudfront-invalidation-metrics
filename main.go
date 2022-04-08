@@ -14,7 +14,7 @@ import (
 
 	cloudfrontclient "cloudfront-invalidation-metrics/internal/cloudfront"
 	cloudwatchclient "cloudfront-invalidation-metrics/internal/cloudwatch"
-	"cloudfront-invalidation-metrics/internal/push-metrics"
+	push_metrics "cloudfront-invalidation-metrics/internal/push-metrics"
 )
 
 const (
@@ -25,9 +25,7 @@ const (
 // Start is an exported abstraction so that the application can be
 // setup in a way that works for you, opposed to being a tightly
 // coupled to provided and assumed Clients.
-func Start() error {
-
-	ctx := context.Background()
+func Start(ctx context.Context) error {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		fmt.Printf("failed to get AWS client config: %s\n", err.Error())
@@ -56,7 +54,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 			DistributionId: distribution.Id,
 		})
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to list invalidations: %w", err)
 		}
 
 		var (
@@ -65,35 +63,27 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
-
 			acceptable, err := IsTimeRangeAcceptable(time.Now(), *invalidation.CreateTime)
 			if err != nil {
-				continue
+				return fmt.Errorf("failed to determine if invalidation is in range: %w", err)
 			}
 
 			if acceptable {
 				countInvalidations++
 			}
 
-			invalidationDetail, _ := clientCloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
+			invalidationDetail, err := clientCloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
 				DistributionId: distribution.Id,
 				Id:             invalidation.Id,
 			})
+			if err != nil {
+				return fmt.Errorf("failed to get invalidation detail: %w", err)
+			}
 
 			if invalidationDetail != nil {
-				acceptable, err := IsTimeRangeAcceptable(time.Now(), *invalidationDetail.Invalidation.CreateTime)
-				if err != nil {
-					continue
-				}
-
-				if !acceptable {
-					break
-				}
-
 				if acceptable {
 					countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
 				}
-
 			}
 		}
 
@@ -128,6 +118,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		if dataQueue.QueueFull {
 			dataQueue.Flush(clientCloudWatch)
 		}
+
 		if err = dataQueue.Add(queueItem); err != nil {
 			return fmt.Errorf(err.Error())
 		}
@@ -153,14 +144,12 @@ func IsTimeRangeAcceptable(timeBaseline time.Time, timeSource time.Time) (bool, 
 	// Calculate what is the acceptable age of an invalidation to ingest.
 	fiveMinutesAgo := timeBaseline.Add(time.Minute * -5)
 	if timestamp.Before(fiveMinutesAgo) {
-		return false, fmt.Errorf("input time exceeds constraints")
+		return true, nil
 	}
 
 	return true, nil
 }
 
 func main() {
-
 	lambda.Start(Start)
-
 }
