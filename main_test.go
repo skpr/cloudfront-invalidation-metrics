@@ -38,15 +38,15 @@ func TestIsTimeRangeAcceptable(t *testing.T) {
 	// is within a specific time frame.
 	sourceFormat := time.Now()
 
-	// Time.Now() - 2 minutes should pass
+	// Time.Now() - An invalidation 2 minutes old must pass
 	if _, err := IsTimeRangeAcceptable(sourceFormat.Add(time.Minute * -2)); err != nil {
 		t.FailNow()
 	}
-	// Time.Now() - 2 hours should not pass
+	// Time.Now() - An invalidation 2 hours old must not pass
 	if _, err := IsTimeRangeAcceptable(sourceFormat.Add(time.Hour * -2)); err == nil {
 		t.FailNow()
 	}
-	// Time.Now() - 24 days should not pass
+	// Time.Now() - An invalidation 2 days old must not pass
 	if _, err := IsTimeRangeAcceptable(sourceFormat.Add((time.Hour * 24) * -2)); err == nil {
 		t.FailNow()
 	}
