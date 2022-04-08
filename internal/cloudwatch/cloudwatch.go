@@ -2,9 +2,9 @@ package cloudwatch
 
 import (
 	"context"
-	"github.com/aws/smithy-go/middleware"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
+	"github.com/aws/smithy-go/middleware"
 )
 
 // CloudWatchClientInterface is a mock cloudwatch interface.

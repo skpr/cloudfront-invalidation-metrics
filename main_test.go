@@ -33,19 +33,21 @@ func TestExecute(t *testing.T) {
 // or negative response from the IsTimeRangeAcceptable function. This regulates
 // a specific timeframe around what metrics should be ingested.
 func TestIsTimeRangeAcceptable(t *testing.T) {
-	baselineFormat, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", "2006-01-02 15:04:05 +0000 UTC")
-	sourceFormat, _ := time.Parse("2006-01-02 15:04:05 +0000 UTC", "2006-01-02 15:04:05 +0000 UTC")
+	// Compare our values against Now() - X
+	// X being the value of time taken from time.Now() to determine if the time
+	// is within a specific time frame.
+	sourceFormat := time.Now()
 
-	// Time.Now() - 2 minutes should return true (not false)
-	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Minute*-2)); !outcome {
+	// Time.Now() - 2 minutes should pass
+	if _, err := IsTimeRangeAcceptable(sourceFormat.Add(time.Minute * -2)); err != nil {
 		t.FailNow()
 	}
-	// Time.Now() - 2 hours should return false (not true)
-	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Hour*-2)); outcome {
+	// Time.Now() - 2 hours should not pass
+	if _, err := IsTimeRangeAcceptable(sourceFormat.Add(time.Hour * -2)); err == nil {
 		t.FailNow()
 	}
-	// Time.Now() - 24 hours should return false (not true)
-	if outcome, _ := IsTimeRangeAcceptable(baselineFormat, sourceFormat.Add(time.Hour*-24)); outcome {
+	// Time.Now() - 24 days should not pass
+	if _, err := IsTimeRangeAcceptable(sourceFormat.Add((time.Hour * 24) * -2)); err == nil {
 		t.FailNow()
 	}
 }

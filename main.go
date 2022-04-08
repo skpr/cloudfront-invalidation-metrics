@@ -63,7 +63,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
-			acceptable, err := IsTimeRangeAcceptable(time.Now(), *invalidation.CreateTime)
+			acceptable, err := IsTimeRangeAcceptable(*invalidation.CreateTime)
 			if err != nil {
 				return fmt.Errorf("failed to determine if invalidation is in range: %w", err)
 			}
@@ -131,22 +131,13 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 
 // IsTimeRangeAcceptable will determine if an input time is within
 // a given date range. It's intended here to be a frequency of every
-// five minutes. timeline
-func IsTimeRangeAcceptable(timeBaseline time.Time, timeSource time.Time) (bool, error) {
-	// Format is the format of the invalidation entry timestamp from GetInvalidation.
-	format := "2006-01-02 15:04:05 +0000 UTC"
-	// Parse the time.Time which will be used to compare to timeBaseline.
-	timestamp, err := time.Parse(format, fmt.Sprint(timeSource))
-	if err != nil {
-		return false, err
-	}
-
+// five minutes.
+func IsTimeRangeAcceptable(input time.Time) (bool, error) {
 	// Calculate what is the acceptable age of an invalidation to ingest.
-	fiveMinutesAgo := timeBaseline.Add(time.Minute * -5)
-	if timestamp.Before(fiveMinutesAgo) {
-		return true, nil
+	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
+	if input.Before(fiveMinutesAgo) {
+		return false, fmt.Errorf("input time is not in a reportable time frame")
 	}
-
 	return true, nil
 }
 
