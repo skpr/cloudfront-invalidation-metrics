@@ -65,7 +65,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		for _, invalidation := range invalidations.InvalidationList.Items {
 			acceptable, err := IsTimeRangeAcceptable(*invalidation.CreateTime)
 			if err != nil {
-				return fmt.Errorf("failed to determine if invalidation is in range: %w", err)
+				return fmt.Errorf("invalidation is not in range: %w", err)
 			}
 
 			if acceptable {
