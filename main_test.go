@@ -1,33 +1,9 @@
 package main
 
 import (
-	"context"
 	"testing"
 	"time"
-
-	"cloudfront-invalidation-metrics/internal/aws/cloudfront"
-	"cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 )
-
-// TestStart will test the Start function for a nil value completion.
-func TestStart(t *testing.T) {
-	err := Start(context.TODO())
-	if err == nil {
-		t.FailNow()
-	}
-}
-
-// TestExecute tests the guts of the Lambda.
-func TestExecute(t *testing.T) {
-	ctx := context.Background()
-	clientCloudFront := cloudfront.MockCloudFrontClient{}
-	clientCloudWatch := cloudwatch.MockCloudWatchClient{}
-
-	err := Execute(ctx, clientCloudFront, clientCloudWatch)
-	if err != nil {
-		t.FailNow()
-	}
-}
 
 // TestIsTimeRangeAcceptable will test if a given input will return a positive
 // or negative response from the IsTimeRangeAcceptable function. This regulates
