@@ -59,6 +59,10 @@ func (c *Client) Flush() error {
 		return nil
 	}
 
+	if len(c.Data) == 0 {
+		return nil
+	}
+
 	_, err := c.CloudWatch.PutMetricData(context.Background(), &cloudwatch.PutMetricDataInput{
 		Namespace:  aws.String(c.Namespace),
 		MetricData: c.Data,
