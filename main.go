@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -13,8 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
 	cloudfrontclient "cloudfront-invalidation-metrics/internal/aws/cloudfront"
-	cloudwatchclient "cloudfront-invalidation-metrics/internal/aws/cloudwatch"
-	push_metrics "cloudfront-invalidation-metrics/internal/push-metrics"
+	"cloudfront-invalidation-metrics/internal/metrics"
 )
 
 const (
@@ -28,25 +28,24 @@ const (
 func Start(ctx context.Context) error {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		fmt.Printf("failed to get AWS client config: %s\n", err.Error())
+		return fmt.Errorf("failed to get AWS client: %w", err)
 	}
 
-	clientCloudWatch := cloudwatch.NewFromConfig(cfg)
-	clientCloudFront := cloudfront.NewFromConfig(cfg)
+	dryRun := os.Getenv("CLOUDFRONT_INVALIDATION_METRICS_DRYRUN") != ""
 
-	return Execute(ctx, clientCloudFront, clientCloudWatch)
+	client, err := metrics.New(cloudwatch.NewFromConfig(cfg), CloudWatchNamespace, dryRun)
+	if err != nil {
+		return fmt.Errorf("failed to setup client: %w", err)
+	}
+
+	return Execute(ctx, cloudfront.NewFromConfig(cfg), client)
 }
 
 // Execute will execute the given API calls against the input Clients.
-func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontClientInterface, clientCloudWatch cloudwatchclient.CloudWatchClientInterface) error {
+func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontClientInterface, client metrics.ClientInterface) error {
 	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
-	}
-
-	var data []types.MetricDatum
-	dataQueue := push_metrics.Queue{
-		Namespace: CloudWatchNamespace,
 	}
 
 	for _, distribution := range distributions.DistributionList.Items {
@@ -87,7 +86,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 			}
 		}
 
-		data = append(data, types.MetricDatum{
+		err = client.Add(types.MetricDatum{
 			MetricName: aws.String("InvalidationRequest"),
 			Unit:       types.StandardUnitCount,
 			Value:      aws.Float64(countInvalidations),
@@ -99,8 +98,11 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 				},
 			},
 		})
+		if err != nil {
+			return fmt.Errorf("failed to push metric: InvalidationRequest: %w", err)
+		}
 
-		data = append(data, types.MetricDatum{
+		err = client.Add(types.MetricDatum{
 			MetricName: aws.String("InvalidationPathCounter"),
 			Unit:       types.StandardUnitCount,
 			Value:      aws.Float64(countPaths),
@@ -112,21 +114,12 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 				},
 			},
 		})
-	}
-
-	for _, queueItem := range data {
-		if dataQueue.QueueFull {
-			dataQueue.Flush(clientCloudWatch)
-		}
-
-		if err = dataQueue.Add(queueItem); err != nil {
-			return fmt.Errorf(err.Error())
+		if err != nil {
+			return fmt.Errorf("failed to push metric: InvalidationPathCounter: %w", err)
 		}
 	}
 
-	err = dataQueue.Flush(clientCloudWatch)
-
-	return err
+	return client.Flush()
 }
 
 // IsTimeRangeAcceptable will determine if an input time is within
