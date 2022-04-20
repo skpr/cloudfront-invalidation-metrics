@@ -22,6 +22,14 @@ const (
 	CloudWatchNamespace = "Skpr/CloudFront"
 )
 
+var (
+	// FiveMinutesAgo is a variable storing time. It will be used to make a
+	// time comparison between the time an invalidation was created and
+	// five minutes ago, which is the fixed input time which this lambda
+	// is intended to execute.
+	FiveMinutesAgo = time.Now().Add(time.Minute * -5)
+)
+
 // Start is an exported abstraction so that the application can be
 // setup in a way that works for you, opposed to being a tightly
 // coupled to provided and assumed Clients.
@@ -63,11 +71,8 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
 
-			// We don't want to this to error out of the application - if
-			// an error is found with the time matching it should break out
-			// of the loop.
-			acceptable, _ := IsTimeRangeAcceptable(*invalidation.CreateTime)
-			if err != nil {
+			acceptable := IsTimeRangeAcceptable(*invalidation.CreateTime)
+			if !acceptable {
 				break
 			}
 
@@ -129,13 +134,13 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 // IsTimeRangeAcceptable will determine if an input time is within
 // a given date range. It's intended here to be a frequency of every
 // five minutes.
-func IsTimeRangeAcceptable(input time.Time) (bool, error) {
+func IsTimeRangeAcceptable(input time.Time) bool {
 	// Calculate what is the acceptable age of an invalidation to ingest.
-	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
-	if input.Before(fiveMinutesAgo) {
-		return false, fmt.Errorf("input time is not in a reportable time frame")
+
+	if !FiveMinutesAgo.Before(input) {
+		return false
 	}
-	return true, nil
+	return true
 }
 
 func main() {

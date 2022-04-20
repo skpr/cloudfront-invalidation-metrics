@@ -15,15 +15,15 @@ func TestIsTimeRangeAcceptable(t *testing.T) {
 	sourceFormat := time.Now()
 
 	// Time.Now() - An invalidation 2 minutes old must pass
-	if _, err := IsTimeRangeAcceptable(sourceFormat.Add(time.Minute * -2)); err != nil {
+	if acceptable := IsTimeRangeAcceptable(sourceFormat.Add(time.Minute * -2)); !acceptable {
 		t.FailNow()
 	}
 	// Time.Now() - An invalidation 2 hours old must not pass
-	if _, err := IsTimeRangeAcceptable(sourceFormat.Add(time.Hour * -2)); err == nil {
+	if acceptable := IsTimeRangeAcceptable(sourceFormat.Add(time.Hour * -2)); acceptable {
 		t.FailNow()
 	}
 	// Time.Now() - An invalidation 2 days old must not pass
-	if _, err := IsTimeRangeAcceptable(sourceFormat.Add((time.Hour * 24) * -2)); err == nil {
+	if acceptable := IsTimeRangeAcceptable(sourceFormat.Add((time.Hour * 24) * -2)); acceptable {
 		t.FailNow()
 	}
 }
