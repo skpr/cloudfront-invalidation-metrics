@@ -62,9 +62,13 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
-			acceptable, err := IsTimeRangeAcceptable(*invalidation.CreateTime)
+
+			// We don't want to this to error out of the application - if
+			// an error is found with the time matching it should break out
+			// of the loop.
+			acceptable, _ := IsTimeRangeAcceptable(*invalidation.CreateTime)
 			if err != nil {
-				return fmt.Errorf("invalidation is not in range: %w", err)
+				break
 			}
 
 			if acceptable {
