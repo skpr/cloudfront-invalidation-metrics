@@ -136,11 +136,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 // five minutes.
 func IsTimeRangeAcceptable(input time.Time) bool {
 	// Calculate what is the acceptable age of an invalidation to ingest.
-
-	if !FiveMinutesAgo.Before(input) {
-		return false
-	}
-	return true
+	return FiveMinutesAgo.Before(input)
 }
 
 func main() {
