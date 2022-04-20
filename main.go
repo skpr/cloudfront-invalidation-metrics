@@ -48,6 +48,12 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
 	}
 
+	// FiveMinutesAgo is a variable storing time. It will be used to make a
+	// time comparison between the time an invalidation was created and
+	// five minutes ago, which is the fixed input time which this lambda
+	// is intended to execute.
+	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
+
 	for _, distribution := range distributions.DistributionList.Items {
 		invalidations, err := clientCloudFront.ListInvalidations(ctx, &cloudfront.ListInvalidationsInput{
 			DistributionId: distribution.Id,
@@ -62,14 +68,13 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
-			acceptable, err := IsTimeRangeAcceptable(*invalidation.CreateTime)
-			if err != nil {
-				return fmt.Errorf("invalidation is not in range: %w", err)
+
+			if !fiveMinutesAgo.Before(*invalidation.CreateTime) {
+				break
 			}
 
-			if acceptable {
-				countInvalidations++
-			}
+			// Include Invalidation in count as the timeframe is acceptable.
+			countInvalidations++
 
 			invalidationDetail, err := clientCloudFront.GetInvalidation(ctx, &cloudfront.GetInvalidationInput{
 				DistributionId: distribution.Id,
@@ -80,9 +85,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 			}
 
 			if invalidationDetail != nil {
-				if acceptable {
-					countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
-				}
+				countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
 			}
 		}
 
@@ -120,18 +123,6 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 	}
 
 	return client.Flush()
-}
-
-// IsTimeRangeAcceptable will determine if an input time is within
-// a given date range. It's intended here to be a frequency of every
-// five minutes.
-func IsTimeRangeAcceptable(input time.Time) (bool, error) {
-	// Calculate what is the acceptable age of an invalidation to ingest.
-	fiveMinutesAgo := time.Now().Add(time.Minute * -5)
-	if input.Before(fiveMinutesAgo) {
-		return false, fmt.Errorf("input time is not in a reportable time frame")
-	}
-	return true, nil
 }
 
 func main() {
