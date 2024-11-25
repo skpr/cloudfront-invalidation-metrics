@@ -4,8 +4,8 @@ package cloudwatch
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
@@ -52,13 +52,18 @@ type GetMetricStreamOutput struct {
 	// stream.
 	ExcludeFilters []types.MetricStreamFilter
 
-	// The ARN of the Amazon Kinesis Firehose delivery stream that is used by this
-	// metric stream.
+	// The ARN of the Amazon Kinesis Data Firehose delivery stream that is used by
+	// this metric stream.
 	FirehoseArn *string
 
 	// If this array of metric namespaces is present, then these namespaces are the
 	// only metric namespaces that are streamed by this metric stream.
 	IncludeFilters []types.MetricStreamFilter
+
+	// If this is true and this metric stream is in a monitoring account, then the
+	// stream includes metrics from source accounts that the monitoring account is
+	// linked to.
+	IncludeLinkedAccountsMetrics *bool
 
 	// The date of the most recent update to the metric stream's configuration.
 	LastUpdateDate *time.Time
@@ -66,14 +71,25 @@ type GetMetricStreamOutput struct {
 	// The name of the metric stream.
 	Name *string
 
+	// The output format for the stream. Valid values are json , opentelemetry1.0 , and
+	// opentelemetry0.7 . For more information about metric stream output formats, see [Metric streams output formats]
+	// .
 	//
+	// [Metric streams output formats]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-metric-streams-formats.html
 	OutputFormat types.MetricStreamOutputFormat
 
 	// The ARN of the IAM role that is used by this metric stream.
 	RoleArn *string
 
-	// The state of the metric stream. The possible values are running and stopped.
+	// The state of the metric stream. The possible values are running and stopped .
 	State *string
+
+	// Each entry in this array displays information about one or more metrics that
+	// include additional statistics in the metric stream. For more information about
+	// the additional statistics, see [CloudWatch statistics definitions].
+	//
+	// [CloudWatch statistics definitions]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Statistics-definitions.html.html
+	StatisticsConfigurations []types.MetricStreamStatisticsConfiguration
 
 	// Metadata pertaining to the operation's result.
 	ResultMetadata middleware.Metadata
@@ -82,6 +98,9 @@ type GetMetricStreamOutput struct {
 }
 
 func (c *Client) addOperationGetMetricStreamMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsAwsquery_serializeOpGetMetricStream{}, middleware.After)
 	if err != nil {
 		return err
@@ -90,34 +109,41 @@ func (c *Client) addOperationGetMetricStreamMiddlewares(stack *middleware.Stack,
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "GetMetricStream"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -126,10 +152,22 @@ func (c *Client) addOperationGetMetricStreamMiddlewares(stack *middleware.Stack,
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpGetMetricStreamValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opGetMetricStream(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -141,6 +179,21 @@ func (c *Client) addOperationGetMetricStreamMiddlewares(stack *middleware.Stack,
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -148,7 +201,6 @@ func newServiceMetadataMiddleware_opGetMetricStream(region string) *awsmiddlewar
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "monitoring",
 		OperationName: "GetMetricStream",
 	}
 }

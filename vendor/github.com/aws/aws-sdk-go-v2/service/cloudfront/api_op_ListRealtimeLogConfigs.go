@@ -4,19 +4,20 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Gets a list of real-time log configurations. You can optionally specify the
-// maximum number of items to receive in the response. If the total number of items
-// in the list exceeds the maximum that you specify, or the default maximum, the
-// response is paginated. To get the next page of items, send a subsequent request
-// that specifies the NextMarker value from the current response as the Marker
-// value in the subsequent request.
+// Gets a list of real-time log configurations.
+//
+// You can optionally specify the maximum number of items to receive in the
+// response. If the total number of items in the list exceeds the maximum that you
+// specify, or the default maximum, the response is paginated. To get the next page
+// of items, send a subsequent request that specifies the NextMarker value from
+// the current response as the Marker value in the subsequent request.
 func (c *Client) ListRealtimeLogConfigs(ctx context.Context, params *ListRealtimeLogConfigsInput, optFns ...func(*Options)) (*ListRealtimeLogConfigsOutput, error) {
 	if params == nil {
 		params = &ListRealtimeLogConfigsInput{}
@@ -37,8 +38,8 @@ type ListRealtimeLogConfigsInput struct {
 	// Use this field when paginating results to indicate where to begin in your list
 	// of real-time log configurations. The response includes real-time log
 	// configurations in the list that occur after the marker. To get the next page of
-	// the list, set this field’s value to the value of NextMarker from the current
-	// page’s response.
+	// the list, set this field's value to the value of NextMarker from the current
+	// page's response.
 	Marker *string
 
 	// The maximum number of real-time log configurations that you want in the
@@ -60,6 +61,9 @@ type ListRealtimeLogConfigsOutput struct {
 }
 
 func (c *Client) addOperationListRealtimeLogConfigsMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpListRealtimeLogConfigs{}, middleware.After)
 	if err != nil {
 		return err
@@ -68,34 +72,41 @@ func (c *Client) addOperationListRealtimeLogConfigsMiddlewares(stack *middleware
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "ListRealtimeLogConfigs"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -104,7 +115,19 @@ func (c *Client) addOperationListRealtimeLogConfigsMiddlewares(stack *middleware
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opListRealtimeLogConfigs(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -116,6 +139,21 @@ func (c *Client) addOperationListRealtimeLogConfigsMiddlewares(stack *middleware
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -123,7 +161,6 @@ func newServiceMetadataMiddleware_opListRealtimeLogConfigs(region string) *awsmi
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "ListRealtimeLogConfigs",
 	}
 }

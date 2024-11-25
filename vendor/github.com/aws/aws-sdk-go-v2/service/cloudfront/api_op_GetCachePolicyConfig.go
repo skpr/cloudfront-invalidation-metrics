@@ -4,18 +4,20 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Gets a cache policy configuration. To get a cache policy configuration, you must
-// provide the policy’s identifier. If the cache policy is attached to a
-// distribution’s cache behavior, you can get the policy’s identifier using
-// ListDistributions or GetDistribution. If the cache policy is not attached to a
-// cache behavior, you can get the identifier using ListCachePolicies.
+// Gets a cache policy configuration.
+//
+// To get a cache policy configuration, you must provide the policy's identifier.
+// If the cache policy is attached to a distribution's cache behavior, you can get
+// the policy's identifier using ListDistributions or GetDistribution . If the
+// cache policy is not attached to a cache behavior, you can get the identifier
+// using ListCachePolicies .
 func (c *Client) GetCachePolicyConfig(ctx context.Context, params *GetCachePolicyConfigInput, optFns ...func(*Options)) (*GetCachePolicyConfigOutput, error) {
 	if params == nil {
 		params = &GetCachePolicyConfigInput{}
@@ -33,10 +35,10 @@ func (c *Client) GetCachePolicyConfig(ctx context.Context, params *GetCachePolic
 
 type GetCachePolicyConfigInput struct {
 
-	// The unique identifier for the cache policy. If the cache policy is attached to a
-	// distribution’s cache behavior, you can get the policy’s identifier using
-	// ListDistributions or GetDistribution. If the cache policy is not attached to a
-	// cache behavior, you can get the identifier using ListCachePolicies.
+	// The unique identifier for the cache policy. If the cache policy is attached to
+	// a distribution's cache behavior, you can get the policy's identifier using
+	// ListDistributions or GetDistribution . If the cache policy is not attached to a
+	// cache behavior, you can get the identifier using ListCachePolicies .
 	//
 	// This member is required.
 	Id *string
@@ -59,6 +61,9 @@ type GetCachePolicyConfigOutput struct {
 }
 
 func (c *Client) addOperationGetCachePolicyConfigMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpGetCachePolicyConfig{}, middleware.After)
 	if err != nil {
 		return err
@@ -67,34 +72,41 @@ func (c *Client) addOperationGetCachePolicyConfigMiddlewares(stack *middleware.S
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "GetCachePolicyConfig"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -103,10 +115,22 @@ func (c *Client) addOperationGetCachePolicyConfigMiddlewares(stack *middleware.S
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpGetCachePolicyConfigValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opGetCachePolicyConfig(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -118,6 +142,21 @@ func (c *Client) addOperationGetCachePolicyConfigMiddlewares(stack *middleware.S
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -125,7 +164,6 @@ func newServiceMetadataMiddleware_opGetCachePolicyConfig(region string) *awsmidd
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "GetCachePolicyConfig",
 	}
 }

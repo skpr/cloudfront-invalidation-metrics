@@ -350,6 +350,26 @@ func (m *validateOpGetMetricWidgetImage) HandleInitialize(ctx context.Context, i
 	return next.HandleInitialize(ctx, in)
 }
 
+type validateOpListManagedInsightRules struct {
+}
+
+func (*validateOpListManagedInsightRules) ID() string {
+	return "OperationInputValidation"
+}
+
+func (m *validateOpListManagedInsightRules) HandleInitialize(ctx context.Context, in middleware.InitializeInput, next middleware.InitializeHandler) (
+	out middleware.InitializeOutput, metadata middleware.Metadata, err error,
+) {
+	input, ok := in.Parameters.(*ListManagedInsightRulesInput)
+	if !ok {
+		return out, metadata, fmt.Errorf("unknown input parameters type %T", in.Parameters)
+	}
+	if err := validateOpListManagedInsightRulesInput(input); err != nil {
+		return out, metadata, err
+	}
+	return next.HandleInitialize(ctx, in)
+}
+
 type validateOpListMetrics struct {
 }
 
@@ -465,6 +485,26 @@ func (m *validateOpPutInsightRule) HandleInitialize(ctx context.Context, in midd
 		return out, metadata, fmt.Errorf("unknown input parameters type %T", in.Parameters)
 	}
 	if err := validateOpPutInsightRuleInput(input); err != nil {
+		return out, metadata, err
+	}
+	return next.HandleInitialize(ctx, in)
+}
+
+type validateOpPutManagedInsightRules struct {
+}
+
+func (*validateOpPutManagedInsightRules) ID() string {
+	return "OperationInputValidation"
+}
+
+func (m *validateOpPutManagedInsightRules) HandleInitialize(ctx context.Context, in middleware.InitializeInput, next middleware.InitializeHandler) (
+	out middleware.InitializeOutput, metadata middleware.Metadata, err error,
+) {
+	input, ok := in.Parameters.(*PutManagedInsightRulesInput)
+	if !ok {
+		return out, metadata, fmt.Errorf("unknown input parameters type %T", in.Parameters)
+	}
+	if err := validateOpPutManagedInsightRulesInput(input); err != nil {
 		return out, metadata, err
 	}
 	return next.HandleInitialize(ctx, in)
@@ -698,6 +738,10 @@ func addOpGetMetricWidgetImageValidationMiddleware(stack *middleware.Stack) erro
 	return stack.Initialize.Add(&validateOpGetMetricWidgetImage{}, middleware.After)
 }
 
+func addOpListManagedInsightRulesValidationMiddleware(stack *middleware.Stack) error {
+	return stack.Initialize.Add(&validateOpListManagedInsightRules{}, middleware.After)
+}
+
 func addOpListMetricsValidationMiddleware(stack *middleware.Stack) error {
 	return stack.Initialize.Add(&validateOpListMetrics{}, middleware.After)
 }
@@ -720,6 +764,10 @@ func addOpPutDashboardValidationMiddleware(stack *middleware.Stack) error {
 
 func addOpPutInsightRuleValidationMiddleware(stack *middleware.Stack) error {
 	return stack.Initialize.Add(&validateOpPutInsightRule{}, middleware.After)
+}
+
+func addOpPutManagedInsightRulesValidationMiddleware(stack *middleware.Stack) error {
+	return stack.Initialize.Add(&validateOpPutManagedInsightRules{}, middleware.After)
 }
 
 func addOpPutMetricAlarmValidationMiddleware(stack *middleware.Stack) error {
@@ -845,6 +893,80 @@ func validateDimensions(v []types.Dimension) error {
 	invalidParams := smithy.InvalidParamsError{Context: "Dimensions"}
 	for i := range v {
 		if err := validateDimension(&v[i]); err != nil {
+			invalidParams.AddNested(fmt.Sprintf("[%d]", i), err.(smithy.InvalidParamsError))
+		}
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateEntityMetricData(v *types.EntityMetricData) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "EntityMetricData"}
+	if v.MetricData != nil {
+		if err := validateMetricData(v.MetricData); err != nil {
+			invalidParams.AddNested("MetricData", err.(smithy.InvalidParamsError))
+		}
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateEntityMetricDataList(v []types.EntityMetricData) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "EntityMetricDataList"}
+	for i := range v {
+		if err := validateEntityMetricData(&v[i]); err != nil {
+			invalidParams.AddNested(fmt.Sprintf("[%d]", i), err.(smithy.InvalidParamsError))
+		}
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateManagedRule(v *types.ManagedRule) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "ManagedRule"}
+	if v.TemplateName == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("TemplateName"))
+	}
+	if v.ResourceARN == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("ResourceARN"))
+	}
+	if v.Tags != nil {
+		if err := validateTagList(v.Tags); err != nil {
+			invalidParams.AddNested("Tags", err.(smithy.InvalidParamsError))
+		}
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateManagedRules(v []types.ManagedRule) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "ManagedRules"}
+	for i := range v {
+		if err := validateManagedRule(&v[i]); err != nil {
 			invalidParams.AddNested(fmt.Sprintf("[%d]", i), err.(smithy.InvalidParamsError))
 		}
 	}
@@ -985,6 +1107,80 @@ func validateMetricStat(v *types.MetricStat) error {
 	}
 	if v.Stat == nil {
 		invalidParams.Add(smithy.NewErrParamRequired("Stat"))
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateMetricStreamStatisticsConfiguration(v *types.MetricStreamStatisticsConfiguration) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "MetricStreamStatisticsConfiguration"}
+	if v.IncludeMetrics == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("IncludeMetrics"))
+	} else if v.IncludeMetrics != nil {
+		if err := validateMetricStreamStatisticsIncludeMetrics(v.IncludeMetrics); err != nil {
+			invalidParams.AddNested("IncludeMetrics", err.(smithy.InvalidParamsError))
+		}
+	}
+	if v.AdditionalStatistics == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("AdditionalStatistics"))
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateMetricStreamStatisticsConfigurations(v []types.MetricStreamStatisticsConfiguration) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "MetricStreamStatisticsConfigurations"}
+	for i := range v {
+		if err := validateMetricStreamStatisticsConfiguration(&v[i]); err != nil {
+			invalidParams.AddNested(fmt.Sprintf("[%d]", i), err.(smithy.InvalidParamsError))
+		}
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateMetricStreamStatisticsIncludeMetrics(v []types.MetricStreamStatisticsMetric) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "MetricStreamStatisticsIncludeMetrics"}
+	for i := range v {
+		if err := validateMetricStreamStatisticsMetric(&v[i]); err != nil {
+			invalidParams.AddNested(fmt.Sprintf("[%d]", i), err.(smithy.InvalidParamsError))
+		}
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
+func validateMetricStreamStatisticsMetric(v *types.MetricStreamStatisticsMetric) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "MetricStreamStatisticsMetric"}
+	if v.Namespace == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("Namespace"))
+	}
+	if v.MetricName == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("MetricName"))
 	}
 	if invalidParams.Len() > 0 {
 		return invalidParams
@@ -1400,6 +1596,21 @@ func validateOpGetMetricWidgetImageInput(v *GetMetricWidgetImageInput) error {
 	}
 }
 
+func validateOpListManagedInsightRulesInput(v *ListManagedInsightRulesInput) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "ListManagedInsightRulesInput"}
+	if v.ResourceARN == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("ResourceARN"))
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
 func validateOpListMetricsInput(v *ListMetricsInput) error {
 	if v == nil {
 		return nil
@@ -1528,6 +1739,25 @@ func validateOpPutInsightRuleInput(v *PutInsightRuleInput) error {
 	}
 }
 
+func validateOpPutManagedInsightRulesInput(v *PutManagedInsightRulesInput) error {
+	if v == nil {
+		return nil
+	}
+	invalidParams := smithy.InvalidParamsError{Context: "PutManagedInsightRulesInput"}
+	if v.ManagedRules == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("ManagedRules"))
+	} else if v.ManagedRules != nil {
+		if err := validateManagedRules(v.ManagedRules); err != nil {
+			invalidParams.AddNested("ManagedRules", err.(smithy.InvalidParamsError))
+		}
+	}
+	if invalidParams.Len() > 0 {
+		return invalidParams
+	} else {
+		return nil
+	}
+}
+
 func validateOpPutMetricAlarmInput(v *PutMetricAlarmInput) error {
 	if v == nil {
 		return nil
@@ -1572,11 +1802,14 @@ func validateOpPutMetricDataInput(v *PutMetricDataInput) error {
 	if v.Namespace == nil {
 		invalidParams.Add(smithy.NewErrParamRequired("Namespace"))
 	}
-	if v.MetricData == nil {
-		invalidParams.Add(smithy.NewErrParamRequired("MetricData"))
-	} else if v.MetricData != nil {
+	if v.MetricData != nil {
 		if err := validateMetricData(v.MetricData); err != nil {
 			invalidParams.AddNested("MetricData", err.(smithy.InvalidParamsError))
+		}
+	}
+	if v.EntityMetricData != nil {
+		if err := validateEntityMetricDataList(v.EntityMetricData); err != nil {
+			invalidParams.AddNested("EntityMetricData", err.(smithy.InvalidParamsError))
 		}
 	}
 	if invalidParams.Len() > 0 {
@@ -1606,6 +1839,11 @@ func validateOpPutMetricStreamInput(v *PutMetricStreamInput) error {
 	if v.Tags != nil {
 		if err := validateTagList(v.Tags); err != nil {
 			invalidParams.AddNested("Tags", err.(smithy.InvalidParamsError))
+		}
+	}
+	if v.StatisticsConfigurations != nil {
+		if err := validateMetricStreamStatisticsConfigurations(v.StatisticsConfigurations); err != nil {
+			invalidParams.AddNested("StatisticsConfigurations", err.(smithy.InvalidParamsError))
 		}
 	}
 	if invalidParams.Len() > 0 {

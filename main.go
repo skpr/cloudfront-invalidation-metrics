@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -11,15 +12,23 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
+	cloudwatchlogstypes "github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
 
 	cloudfrontclient "cloudfront-invalidation-metrics/internal/aws/cloudfront"
+	"cloudfront-invalidation-metrics/internal/logs"
 	"cloudfront-invalidation-metrics/internal/metrics"
 )
 
 const (
 	// CloudWatchNamespace is the CloudWatch Namespace to store metrics in.
 	CloudWatchNamespace = "Skpr/CloudFront"
+
+	// InvalidationLogGroupKey is the key used to store the log group name in the tags.
+	InvalidationLogGroupKey = "invalidations.cloudfront.skpr.io/loggroup"
+	// InvalidationLogStreamKey is the key used to store the log stream name in the tags.
+	InvalidationLogStreamKey = "invalidations.cloudfront.skpr.io/stream"
 )
 
 // Start is an exported abstraction so that the application can be
@@ -33,16 +42,21 @@ func Start(ctx context.Context) error {
 
 	dryRun := os.Getenv("CLOUDFRONT_INVALIDATION_METRICS_DRYRUN") != ""
 
-	client, err := metrics.New(cloudwatch.NewFromConfig(cfg), CloudWatchNamespace, dryRun)
+	metricsClient, err := metrics.New(cloudwatch.NewFromConfig(cfg), CloudWatchNamespace, dryRun)
 	if err != nil {
-		return fmt.Errorf("failed to setup client: %w", err)
+		return fmt.Errorf("failed to setup metricsClient: %w", err)
 	}
 
-	return Execute(ctx, cloudfront.NewFromConfig(cfg), client)
+	logsClient, err := logs.New(cloudwatchlogs.NewFromConfig(cfg), CloudWatchNamespace, dryRun)
+	if err != nil {
+		return fmt.Errorf("failed to setup logsClient: %w", err)
+	}
+
+	return Execute(ctx, cloudfront.NewFromConfig(cfg), metricsClient, logsClient)
 }
 
 // Execute will execute the given API calls against the input Clients.
-func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontClientInterface, client metrics.ClientInterface) error {
+func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, metricsClient metrics.ClientInterface, logsClient logs.ClientInterface) error {
 	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
@@ -65,6 +79,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		var (
 			countInvalidations float64
 			countPaths         float64
+			invalidationPaths  []string
 		)
 
 		for _, invalidation := range invalidations.InvalidationList.Items {
@@ -86,15 +101,49 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 
 			if invalidationDetail != nil {
 				countPaths = countPaths + float64(*invalidationDetail.Invalidation.InvalidationBatch.Paths.Quantity)
+				invalidationPaths = invalidationDetail.Invalidation.InvalidationBatch.Paths.Items
 			}
 		}
 
-		err = client.Add(types.MetricDatum{
+		var logGroupName string
+		var logStreamName string
+
+		// fetch log group and log name from distribution tags
+		tags, err := clientCloudFront.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
+			Resource: distribution.ARN,
+		})
+
+		for _, tag := range tags.Tags.Items {
+			if *tag.Key == InvalidationLogGroupKey {
+				logGroupName = *tag.Value
+			}
+
+			if *tag.Key == InvalidationLogStreamKey {
+				logStreamName = *tag.Value
+			}
+		}
+
+		// verify log group and log stream exist
+		err = logsClient.Verify(ctx, logGroupName, logStreamName)
+		if err != nil {
+			return fmt.Errorf("failed to add logs: %w", err)
+		}
+
+		// send logs to cloudwatch
+		err = logsClient.Flush(ctx, logGroupName, logStreamName, cloudwatchlogstypes.InputLogEvent{
+			Message:   aws.String(fmt.Sprintf("InvalidationRequest: %g, InvalidationPathCounter: %g, InvalidatedPaths: %s", countInvalidations, countPaths, strings.Join(invalidationPaths, ","))),
+			Timestamp: aws.Int64(time.Now().UnixNano() / int64(time.Millisecond)),
+		})
+		if err != nil {
+			return fmt.Errorf("failed to flush logs: %w", err)
+		}
+
+		err = metricsClient.Add(cloudwatchtypes.MetricDatum{
 			MetricName: aws.String("InvalidationRequest"),
-			Unit:       types.StandardUnitCount,
+			Unit:       cloudwatchtypes.StandardUnitCount,
 			Value:      aws.Float64(countInvalidations),
 			Timestamp:  aws.Time(time.Now()),
-			Dimensions: []types.Dimension{
+			Dimensions: []cloudwatchtypes.Dimension{
 				{
 					Name:  aws.String("Distribution"),
 					Value: aws.String(*distribution.Id),
@@ -105,12 +154,12 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 			return fmt.Errorf("failed to push metric: InvalidationRequest: %w", err)
 		}
 
-		err = client.Add(types.MetricDatum{
+		err = metricsClient.Add(cloudwatchtypes.MetricDatum{
 			MetricName: aws.String("InvalidationPathCounter"),
-			Unit:       types.StandardUnitCount,
+			Unit:       cloudwatchtypes.StandardUnitCount,
 			Value:      aws.Float64(countPaths),
 			Timestamp:  aws.Time(time.Now()),
-			Dimensions: []types.Dimension{
+			Dimensions: []cloudwatchtypes.Dimension{
 				{
 					Name:  aws.String("Distribution"),
 					Value: aws.String(*distribution.Id),
@@ -122,7 +171,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontCl
 		}
 	}
 
-	return client.Flush()
+	return metricsClient.Flush()
 }
 
 func main() {
