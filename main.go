@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
+	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	cloudwatchtypes "github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
@@ -105,37 +106,17 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterf
 			}
 		}
 
-		var logGroupName string
-		var logStreamName string
-
 		// fetch log group and log name from distribution tags
-		tags, err := clientCloudFront.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
-			Resource: distribution.ARN,
-		})
-
-		for _, tag := range tags.Tags.Items {
-			if *tag.Key == InvalidationLogGroupKey {
-				logGroupName = *tag.Value
+		logGroupName, logStreamName, logExists, err := PullTags(ctx, clientCloudFront, distribution)
+		if logExists {
+			// send logs to cloudwatch
+			err = logsClient.Flush(ctx, logGroupName, logStreamName, cloudwatchlogstypes.InputLogEvent{
+				Message:   aws.String(fmt.Sprintf("{ \"InvalidationRequestID\": \"%g\", \"InvalidationPathCount\": %g, \"InvalidatedPaths\": [%s]}", countInvalidations, countPaths, strings.Join(invalidationPaths, ","))),
+				Timestamp: aws.Int64(time.Now().UnixNano() / int64(time.Millisecond)),
+			})
+			if err != nil {
+				return fmt.Errorf("failed to push log: %w", err)
 			}
-
-			if *tag.Key == InvalidationLogStreamKey {
-				logStreamName = *tag.Value
-			}
-		}
-
-		// verify log group and log stream exist
-		err = logsClient.Verify(ctx, logGroupName, logStreamName)
-		if err != nil {
-			return fmt.Errorf("failed to add logs: %w", err)
-		}
-
-		// send logs to cloudwatch
-		err = logsClient.Flush(ctx, logGroupName, logStreamName, cloudwatchlogstypes.InputLogEvent{
-			Message:   aws.String(fmt.Sprintf("InvalidationRequest: %g, InvalidationPathCounter: %g, InvalidatedPaths: %s", countInvalidations, countPaths, strings.Join(invalidationPaths, ","))),
-			Timestamp: aws.Int64(time.Now().UnixNano() / int64(time.Millisecond)),
-		})
-		if err != nil {
-			return fmt.Errorf("failed to flush logs: %w", err)
 		}
 
 		err = metricsClient.Add(cloudwatchtypes.MetricDatum{
@@ -176,4 +157,29 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterf
 
 func main() {
 	lambda.Start(Start)
+}
+
+func PullTags(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, distribution types.DistributionSummary) (logGroupName string, logStreamName string, tagExists bool, err error) {
+	tags, err := clientCloudFront.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
+		Resource: distribution.ARN,
+	})
+	if err != nil {
+		return "", "", false, fmt.Errorf("failed to list tags: %w", err)
+	}
+
+	for _, tag := range tags.Tags.Items {
+		if *tag.Key == InvalidationLogGroupKey {
+			logGroupName = *tag.Value
+		}
+
+		if *tag.Key == InvalidationLogStreamKey {
+			logStreamName = *tag.Value
+		}
+	}
+
+	if logGroupName == "" || logStreamName == "" {
+		return "", "", false, fmt.Errorf("failed to get log group or log stream name from tags")
+	}
+
+	return logGroupName, logStreamName, true, nil
 }

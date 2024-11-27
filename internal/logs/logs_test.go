@@ -12,18 +12,6 @@ import (
 	client "cloudfront-invalidation-metrics/internal/aws/cloudwatchlogs"
 )
 
-func TestVerify(t *testing.T) {
-	client, err := New(&client.MockCloudWatchLogsClient{}, "dev/null", false)
-	assert.NoError(t, err)
-
-	output, err := captureOutput(func() error {
-		err := client.Verify(nil, "dev/test-group", "test")
-		return err
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, "Log group already exists: dev/test-group\nLog stream already exists: test\n", output)
-}
-
 func TestFlush(t *testing.T) {
 	cw := &client.MockCloudWatchLogsClient{}
 
@@ -38,7 +26,7 @@ func TestFlush(t *testing.T) {
 		return err
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "Flushed log events to dev/test-group/test\n", output)
+	assert.Equal(t, "Creating log group: dev/test-group\nCreating log stream: test\nFlushed log events to dev/test-group/test\n", output)
 }
 
 func captureOutput(f func() error) (string, error) {
