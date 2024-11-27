@@ -107,7 +107,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterf
 		}
 
 		// fetch log group and log name from distribution tags
-		logGroupName, logStreamName, logExists, err := PullTags(ctx, clientCloudFront, distribution)
+		logGroupName, logStreamName, logExists, err := pullTags(ctx, clientCloudFront, distribution)
 		if logExists {
 			// send logs to cloudwatch
 			err = logsClient.Flush(ctx, logGroupName, logStreamName, cloudwatchlogstypes.InputLogEvent{
@@ -159,7 +159,8 @@ func main() {
 	lambda.Start(Start)
 }
 
-func PullTags(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, distribution types.DistributionSummary) (logGroupName string, logStreamName string, tagExists bool, err error) {
+// pullTags will pull the tags from the distribution and return the log group and log stream name.
+func pullTags(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, distribution types.DistributionSummary) (logGroupName string, logStreamName string, tagExists bool, err error) {
 	tags, err := clientCloudFront.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
 		Resource: distribution.ARN,
 	})
