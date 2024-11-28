@@ -160,13 +160,18 @@ func main() {
 }
 
 // pullTags will pull the tags from the distribution and return the log group and log stream name.
-func pullTags(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, distribution types.DistributionSummary) (logGroupName string, logStreamName string, tagExists bool, err error) {
+func pullTags(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, distribution types.DistributionSummary) (string, string, bool, error) {
 	tags, err := clientCloudFront.ListTagsForResource(ctx, &cloudfront.ListTagsForResourceInput{
 		Resource: distribution.ARN,
 	})
 	if err != nil {
 		return "", "", false, fmt.Errorf("failed to list tags: %w", err)
 	}
+
+	var (
+		logGroupName string
+		logStreamName string
+	)
 
 	for _, tag := range tags.Tags.Items {
 		if *tag.Key == InvalidationLogGroupKey {
