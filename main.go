@@ -57,7 +57,7 @@ func Start(ctx context.Context) error {
 }
 
 // Execute will execute the given API calls against the input Clients.
-func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, metricsClient metrics.ClientInterface, logsClient logs.ClientInterface) error {
+func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, metricsClient metrics.ClientInterface, logsClient *logs.Client) error {
 	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
@@ -110,7 +110,7 @@ func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterf
 		logGroupName, logStreamName, logExists, err := pullTags(ctx, clientCloudFront, distribution)
 		if logExists {
 			// send logs to cloudwatch
-			err = logsClient.Flush(ctx, logGroupName, logStreamName, cloudwatchlogstypes.InputLogEvent{
+			err = logsClient.Send(ctx, logGroupName, logStreamName, cloudwatchlogstypes.InputLogEvent{
 				Message:   aws.String(fmt.Sprintf("{ \"InvalidationRequestID\": \"%g\", \"InvalidationPathCount\": %g, \"InvalidatedPaths\": [%s]}", countInvalidations, countPaths, strings.Join(invalidationPaths, ","))),
 				Timestamp: aws.Int64(time.Now().UnixNano() / int64(time.Millisecond)),
 			})
@@ -169,7 +169,7 @@ func pullTags(ctx context.Context, clientCloudFront cloudfrontclient.ClientInter
 	}
 
 	var (
-		logGroupName string
+		logGroupName  string
 		logStreamName string
 	)
 

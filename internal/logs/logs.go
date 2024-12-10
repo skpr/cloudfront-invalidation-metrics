@@ -12,15 +12,9 @@ import (
 	cloudwatchlogsclient "cloudfront-invalidation-metrics/internal/aws/cloudwatchlogs"
 )
 
-const (
-	// AwsPayloadLimit is the maximum quality for a data-set to contain
-	// before AWS will reject the payload.
-	AwsPayloadLimit = 20
-)
-
 // ClientInterface for pushing metrics to CloudWatch.
 type ClientInterface interface {
-	Flush(ctx context.Context, logGroupName string, logStreamName string, logData types.InputLogEvent) error
+	Send(ctx context.Context, logGroupName string, logStreamName string, logData types.InputLogEvent) error
 }
 
 // Client for pushing metrics to CloudWatch.
@@ -42,8 +36,8 @@ func New(cloudwatchlogs cloudwatchlogsclient.ClientInterface, namespace string, 
 	}, nil
 }
 
-// Flush logs to CloudWatch.
-func (c *Client) Flush(ctx context.Context, logGroupName string, logStreamName string, logData types.InputLogEvent) error {
+// Send logs to CloudWatch.
+func (c *Client) Send(ctx context.Context, logGroupName string, logStreamName string, logData types.InputLogEvent) error {
 	if c.DryRun {
 		return nil
 	}

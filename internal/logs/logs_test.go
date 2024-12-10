@@ -12,14 +12,14 @@ import (
 	client "cloudfront-invalidation-metrics/internal/aws/cloudwatchlogs"
 )
 
-func TestFlush(t *testing.T) {
+func TestSend(t *testing.T) {
 	cw := &client.MockCloudWatchLogsClient{}
 
 	client, err := New(cw, "dev/null", false)
 	assert.NoError(t, err)
 
 	output, err := captureOutput(func() error {
-		err := client.Flush(nil, "dev/test-group", "test", types.InputLogEvent{
+		err := client.Send(nil, "dev/test-group", "test", types.InputLogEvent{
 			Message:   aws.String("test"),
 			Timestamp: aws.Int64(0),
 		})
