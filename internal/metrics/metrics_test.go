@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/stretchr/testify/assert"
 
-	client "cloudfront-invalidation-metrics/internal/aws/cloudwatch"
+	client "github.com/skpr/cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 )
 
 func TestAdd(t *testing.T) {
