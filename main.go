@@ -42,7 +42,7 @@ func Start(ctx context.Context) error {
 }
 
 // Execute will execute the given API calls against the input Clients.
-func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontClientInterface, client metrics.ClientInterface) error {
+func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, client metrics.ClientInterface) error {
 	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)

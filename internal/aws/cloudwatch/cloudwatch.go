@@ -13,13 +13,13 @@ type ClientInterface interface {
 	PutMetricData(ctx context.Context, params *cloudwatch.PutMetricDataInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.PutMetricDataOutput, error)
 }
 
-// MockCloudWatchClient is a mock cloudwatch client.
-type MockCloudWatchClient struct {
+// MockClient is a mock cloudwatch client.
+type MockClient struct {
 	MetricData []types.MetricDatum
 }
 
 // PutMetricData mock function.
-func (c *MockCloudWatchClient) PutMetricData(ctx context.Context, params *cloudwatch.PutMetricDataInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.PutMetricDataOutput, error) {
+func (c *MockClient) PutMetricData(ctx context.Context, params *cloudwatch.PutMetricDataInput, optFns ...func(*cloudwatch.Options)) (*cloudwatch.PutMetricDataOutput, error) {
 	// Store the metrics for later.
 	c.MetricData = append(c.MetricData, params.MetricData...)
 
