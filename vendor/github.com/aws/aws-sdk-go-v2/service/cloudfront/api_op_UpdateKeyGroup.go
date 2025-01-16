@@ -4,26 +4,26 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Updates a key group. When you update a key group, all the fields are updated
-// with the values provided in the request. You cannot update some fields
-// independent of others. To update a key group:
+// Updates a key group.
 //
-// * Get the current key group with
-// GetKeyGroup or GetKeyGroupConfig.
+// When you update a key group, all the fields are updated with the values
+// provided in the request. You cannot update some fields independent of others. To
+// update a key group:
 //
-// * Locally modify the fields in the key group
-// that you want to update. For example, add or remove public key IDs.
+//   - Get the current key group with GetKeyGroup or GetKeyGroupConfig .
 //
-// * Call
-// UpdateKeyGroup with the entire key group object, including the fields that you
-// modified and those that you didn’t.
+//   - Locally modify the fields in the key group that you want to update. For
+//     example, add or remove public key IDs.
+//
+//   - Call UpdateKeyGroup with the entire key group object, including the fields
+//     that you modified and those that you didn't.
 func (c *Client) UpdateKeyGroup(ctx context.Context, params *UpdateKeyGroupInput, optFns ...func(*Options)) (*UpdateKeyGroupOutput, error) {
 	if params == nil {
 		params = &UpdateKeyGroupInput{}
@@ -52,7 +52,7 @@ type UpdateKeyGroupInput struct {
 	KeyGroupConfig *types.KeyGroupConfig
 
 	// The version of the key group that you are updating. The version is the key
-	// group’s ETag value.
+	// group's ETag value.
 	IfMatch *string
 
 	noSmithyDocumentSerde
@@ -73,6 +73,9 @@ type UpdateKeyGroupOutput struct {
 }
 
 func (c *Client) addOperationUpdateKeyGroupMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpUpdateKeyGroup{}, middleware.After)
 	if err != nil {
 		return err
@@ -81,34 +84,41 @@ func (c *Client) addOperationUpdateKeyGroupMiddlewares(stack *middleware.Stack, 
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "UpdateKeyGroup"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -117,10 +127,22 @@ func (c *Client) addOperationUpdateKeyGroupMiddlewares(stack *middleware.Stack, 
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpUpdateKeyGroupValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opUpdateKeyGroup(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -132,6 +154,21 @@ func (c *Client) addOperationUpdateKeyGroupMiddlewares(stack *middleware.Stack, 
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -139,7 +176,6 @@ func newServiceMetadataMiddleware_opUpdateKeyGroup(region string) *awsmiddleware
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "UpdateKeyGroup",
 	}
 }

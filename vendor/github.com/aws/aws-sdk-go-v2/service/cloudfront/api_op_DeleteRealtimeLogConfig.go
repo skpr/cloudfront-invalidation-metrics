@@ -4,19 +4,23 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Deletes a real-time log configuration. You cannot delete a real-time log
-// configuration if it’s attached to a cache behavior. First update your
-// distributions to remove the real-time log configuration from all cache
-// behaviors, then delete the real-time log configuration. To delete a real-time
-// log configuration, you can provide the configuration’s name or its Amazon
-// Resource Name (ARN). You must provide at least one. If you provide both,
-// CloudFront uses the name to identify the real-time log configuration to delete.
+// Deletes a real-time log configuration.
+//
+// You cannot delete a real-time log configuration if it's attached to a cache
+// behavior. First update your distributions to remove the real-time log
+// configuration from all cache behaviors, then delete the real-time log
+// configuration.
+//
+// To delete a real-time log configuration, you can provide the configuration's
+// name or its Amazon Resource Name (ARN). You must provide at least one. If you
+// provide both, CloudFront uses the name to identify the real-time log
+// configuration to delete.
 func (c *Client) DeleteRealtimeLogConfig(ctx context.Context, params *DeleteRealtimeLogConfigInput, optFns ...func(*Options)) (*DeleteRealtimeLogConfigOutput, error) {
 	if params == nil {
 		params = &DeleteRealtimeLogConfigInput{}
@@ -51,6 +55,9 @@ type DeleteRealtimeLogConfigOutput struct {
 }
 
 func (c *Client) addOperationDeleteRealtimeLogConfigMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpDeleteRealtimeLogConfig{}, middleware.After)
 	if err != nil {
 		return err
@@ -59,34 +66,41 @@ func (c *Client) addOperationDeleteRealtimeLogConfigMiddlewares(stack *middlewar
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "DeleteRealtimeLogConfig"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -95,7 +109,19 @@ func (c *Client) addOperationDeleteRealtimeLogConfigMiddlewares(stack *middlewar
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opDeleteRealtimeLogConfig(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -107,6 +133,21 @@ func (c *Client) addOperationDeleteRealtimeLogConfigMiddlewares(stack *middlewar
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -114,7 +155,6 @@ func newServiceMetadataMiddleware_opDeleteRealtimeLogConfig(region string) *awsm
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "DeleteRealtimeLogConfig",
 	}
 }

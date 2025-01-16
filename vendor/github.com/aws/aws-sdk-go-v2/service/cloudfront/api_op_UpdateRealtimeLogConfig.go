@@ -4,30 +4,29 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Updates a real-time log configuration. When you update a real-time log
-// configuration, all the parameters are updated with the values provided in the
-// request. You cannot update some parameters independent of others. To update a
-// real-time log configuration:
+// Updates a real-time log configuration.
 //
-// * Call GetRealtimeLogConfig to get the current
-// real-time log configuration.
+// When you update a real-time log configuration, all the parameters are updated
+// with the values provided in the request. You cannot update some parameters
+// independent of others. To update a real-time log configuration:
 //
-// * Locally modify the parameters in the real-time
-// log configuration that you want to update.
+//   - Call GetRealtimeLogConfig to get the current real-time log configuration.
 //
-// * Call this API
-// (UpdateRealtimeLogConfig) by providing the entire real-time log configuration,
-// including the parameters that you modified and those that you didn’t.
+//   - Locally modify the parameters in the real-time log configuration that you
+//     want to update.
 //
-// You
-// cannot update a real-time log configuration’s Name or ARN.
+//   - Call this API ( UpdateRealtimeLogConfig ) by providing the entire real-time
+//     log configuration, including the parameters that you modified and those that you
+//     didn't.
+//
+// You cannot update a real-time log configuration's Name or ARN .
 func (c *Client) UpdateRealtimeLogConfig(ctx context.Context, params *UpdateRealtimeLogConfigInput, optFns ...func(*Options)) (*UpdateRealtimeLogConfigOutput, error) {
 	if params == nil {
 		params = &UpdateRealtimeLogConfigInput{}
@@ -52,10 +51,12 @@ type UpdateRealtimeLogConfigInput struct {
 	// real-time log data.
 	EndPoints []types.EndPoint
 
-	// A list of fields to include in each real-time log record. For more information
-	// about fields, see Real-time log configuration fields
-	// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields)
-	// in the Amazon CloudFront Developer Guide.
+	// A list of fields to include in each real-time log record.
+	//
+	// For more information about fields, see [Real-time log configuration fields] in the Amazon CloudFront Developer
+	// Guide.
+	//
+	// [Real-time log configuration fields]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields
 	Fields []string
 
 	// The name for this real-time log configuration.
@@ -81,6 +82,9 @@ type UpdateRealtimeLogConfigOutput struct {
 }
 
 func (c *Client) addOperationUpdateRealtimeLogConfigMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpUpdateRealtimeLogConfig{}, middleware.After)
 	if err != nil {
 		return err
@@ -89,34 +93,41 @@ func (c *Client) addOperationUpdateRealtimeLogConfigMiddlewares(stack *middlewar
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "UpdateRealtimeLogConfig"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -125,10 +136,22 @@ func (c *Client) addOperationUpdateRealtimeLogConfigMiddlewares(stack *middlewar
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpUpdateRealtimeLogConfigValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opUpdateRealtimeLogConfig(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -140,6 +163,21 @@ func (c *Client) addOperationUpdateRealtimeLogConfigMiddlewares(stack *middlewar
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -147,7 +185,6 @@ func newServiceMetadataMiddleware_opUpdateRealtimeLogConfig(region string) *awsm
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "UpdateRealtimeLogConfig",
 	}
 }

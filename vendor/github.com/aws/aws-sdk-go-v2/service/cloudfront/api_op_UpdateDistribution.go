@@ -4,91 +4,38 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Updates the configuration for a web distribution. When you update a
-// distribution, there are more required fields than when you create a
-// distribution. When you update your distribution by using this API action, follow
-// the steps here to get the current configuration and then make your updates, to
-// make sure that you include all of the required fields. To view a summary, see
-// Required Fields for Create Distribution and Update Distribution
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-overview-required-fields.html)
-// in the Amazon CloudFront Developer Guide. The update process includes getting
-// the current distribution configuration, updating the XML document that is
-// returned to make your changes, and then submitting an UpdateDistribution request
-// to make the updates. For information about updating a distribution using the
-// CloudFront console instead, see Creating a Distribution
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/distribution-web-creating-console.html)
-// in the Amazon CloudFront Developer Guide. To update a web distribution using the
-// CloudFront API
+// Updates the configuration for a CloudFront distribution.
 //
-// * Submit a GetDistributionConfig
-// (https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_GetDistributionConfig.html)
-// request to get the current configuration and an Etag header
+// The update process includes getting the current distribution configuration,
+// updating it to make your changes, and then submitting an UpdateDistribution
+// request to make the updates.
 //
-// for the
-// distribution. If you update the distribution again, you must get a new Etag
-// header.
+// To update a web distribution using the CloudFront API
 //
-// * Update the XML document that was returned in the response to your
-// GetDistributionConfig request to include your changes. When you edit the XML
-// file, be aware of the following:
+//   - Use GetDistributionConfig to get the current configuration, including the
+//     version identifier ( ETag ).
 //
-// * You must strip out the ETag parameter that
-// is returned.
+//   - Update the distribution configuration that was returned in the response.
+//     Note the following important requirements and restrictions:
 //
-// * Additional fields are required when you update a distribution.
-// There may be fields included in the XML file for features that you haven't
-// configured for your distribution. This is expected and required to successfully
-// update the distribution.
+//   - You must copy the ETag field value from the response. (You'll use it for the
+//     IfMatch parameter in your request.) Then, remove the ETag field from the
+//     distribution configuration.
 //
-// * You can't change the value of CallerReference. If
-// you try to change this value, CloudFront returns an
+//   - You can't change the value of CallerReference .
 //
-// IllegalUpdate error.
-//
-// * The
-// new configuration replaces the existing configuration; the values that you
-// specify in an UpdateDistribution request are not merged into your existing
-// configuration. When you add, delete, or replace values in an element that allows
-// multiple values (for example, CNAME), you must specify all of the values that
-// you want to appear in the updated distribution. In addition,
-//
-// you must update
-// the corresponding Quantity element.
-//
-// * Submit an UpdateDistribution request to
-// update the configuration for your distribution:
-//
-// * In the request body, include
-// the XML document that you updated in Step 2. The request body must include
-// an
-//
-// XML document with a DistributionConfig element.
-//
-// * Set the value of the HTTP
-// If-Match header to the value of the ETag header that CloudFront returned
-//
-// when
-// you submitted the GetDistributionConfig request in Step 1.
-//
-// * Review the
-// response to the UpdateDistribution request to confirm that the configuration
-// was
-//
-// successfully updated.
-//
-// * Optional: Submit a GetDistribution
-// (https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_GetDistribution.html)
-// request to confirm that your changes have propagated.
-//
-// When propagation is
-// complete, the value of Status is Deployed.
+//   - Submit an UpdateDistribution request, providing the updated distribution
+//     configuration. The new configuration replaces the existing configuration. The
+//     values that you specify in an UpdateDistribution request are not merged into
+//     your existing configuration. Make sure to include all fields: the ones that you
+//     modified and also the ones that you didn't.
 func (c *Client) UpdateDistribution(ctx context.Context, params *UpdateDistributionInput, optFns ...func(*Options)) (*UpdateDistributionOutput, error) {
 	if params == nil {
 		params = &UpdateDistributionInput{}
@@ -118,7 +65,7 @@ type UpdateDistributionInput struct {
 	Id *string
 
 	// The value of the ETag header that you received when retrieving the
-	// distribution's configuration. For example: E2QWRUHAPOMQZL.
+	// distribution's configuration. For example: E2QWRUHAPOMQZL .
 	IfMatch *string
 
 	noSmithyDocumentSerde
@@ -130,7 +77,7 @@ type UpdateDistributionOutput struct {
 	// The distribution's information.
 	Distribution *types.Distribution
 
-	// The current version of the configuration. For example: E2QWRUHAPOMQZL.
+	// The current version of the configuration. For example: E2QWRUHAPOMQZL .
 	ETag *string
 
 	// Metadata pertaining to the operation's result.
@@ -140,6 +87,9 @@ type UpdateDistributionOutput struct {
 }
 
 func (c *Client) addOperationUpdateDistributionMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpUpdateDistribution{}, middleware.After)
 	if err != nil {
 		return err
@@ -148,34 +98,41 @@ func (c *Client) addOperationUpdateDistributionMiddlewares(stack *middleware.Sta
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "UpdateDistribution"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -184,10 +141,22 @@ func (c *Client) addOperationUpdateDistributionMiddlewares(stack *middleware.Sta
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpUpdateDistributionValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opUpdateDistribution(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -199,6 +168,21 @@ func (c *Client) addOperationUpdateDistributionMiddlewares(stack *middleware.Sta
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -206,7 +190,6 @@ func newServiceMetadataMiddleware_opUpdateDistribution(region string) *awsmiddle
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "UpdateDistribution",
 	}
 }

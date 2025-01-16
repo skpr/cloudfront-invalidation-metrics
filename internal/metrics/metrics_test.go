@@ -7,11 +7,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/stretchr/testify/assert"
 
-	client "cloudfront-invalidation-metrics/internal/aws/cloudwatch"
+	client "github.com/skpr/cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 )
 
 func TestAdd(t *testing.T) {
-	client, err := New(&client.MockCloudWatchClient{}, "dev/null", false)
+	client, err := New(&client.MockClient{}, "dev/null", false)
 	assert.NoError(t, err)
 
 	err = client.Add(types.MetricDatum{
@@ -25,7 +25,7 @@ func TestAdd(t *testing.T) {
 }
 
 func TestFlush(t *testing.T) {
-	cw := &client.MockCloudWatchClient{}
+	cw := &client.MockClient{}
 
 	client, err := New(cw, "dev/null", false)
 	assert.NoError(t, err)

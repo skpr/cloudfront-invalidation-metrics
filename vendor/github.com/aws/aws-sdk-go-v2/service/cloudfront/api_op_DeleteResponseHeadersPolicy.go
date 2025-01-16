@@ -4,18 +4,21 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Deletes a response headers policy. You cannot delete a response headers policy
-// if it’s attached to a cache behavior. First update your distributions to remove
-// the response headers policy from all cache behaviors, then delete the response
-// headers policy. To delete a response headers policy, you must provide the
-// policy’s identifier and version. To get these values, you can use
-// ListResponseHeadersPolicies or GetResponseHeadersPolicy.
+// Deletes a response headers policy.
+//
+// You cannot delete a response headers policy if it's attached to a cache
+// behavior. First update your distributions to remove the response headers policy
+// from all cache behaviors, then delete the response headers policy.
+//
+// To delete a response headers policy, you must provide the policy's identifier
+// and version. To get these values, you can use ListResponseHeadersPolicies or
+// GetResponseHeadersPolicy .
 func (c *Client) DeleteResponseHeadersPolicy(ctx context.Context, params *DeleteResponseHeadersPolicyInput, optFns ...func(*Options)) (*DeleteResponseHeadersPolicyOutput, error) {
 	if params == nil {
 		params = &DeleteResponseHeadersPolicyInput{}
@@ -33,16 +36,18 @@ func (c *Client) DeleteResponseHeadersPolicy(ctx context.Context, params *Delete
 
 type DeleteResponseHeadersPolicyInput struct {
 
-	// The identifier for the response headers policy that you are deleting. To get the
-	// identifier, you can use ListResponseHeadersPolicies.
+	// The identifier for the response headers policy that you are deleting.
+	//
+	// To get the identifier, you can use ListResponseHeadersPolicies .
 	//
 	// This member is required.
 	Id *string
 
-	// The version of the response headers policy that you are deleting. The version is
-	// the response headers policy’s ETag value, which you can get using
-	// ListResponseHeadersPolicies, GetResponseHeadersPolicy, or
-	// GetResponseHeadersPolicyConfig.
+	// The version of the response headers policy that you are deleting.
+	//
+	// The version is the response headers policy's ETag value, which you can get
+	// using ListResponseHeadersPolicies , GetResponseHeadersPolicy , or
+	// GetResponseHeadersPolicyConfig .
 	IfMatch *string
 
 	noSmithyDocumentSerde
@@ -56,6 +61,9 @@ type DeleteResponseHeadersPolicyOutput struct {
 }
 
 func (c *Client) addOperationDeleteResponseHeadersPolicyMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpDeleteResponseHeadersPolicy{}, middleware.After)
 	if err != nil {
 		return err
@@ -64,34 +72,41 @@ func (c *Client) addOperationDeleteResponseHeadersPolicyMiddlewares(stack *middl
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "DeleteResponseHeadersPolicy"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -100,10 +115,22 @@ func (c *Client) addOperationDeleteResponseHeadersPolicyMiddlewares(stack *middl
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpDeleteResponseHeadersPolicyValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opDeleteResponseHeadersPolicy(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -115,6 +142,21 @@ func (c *Client) addOperationDeleteResponseHeadersPolicyMiddlewares(stack *middl
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -122,7 +164,6 @@ func newServiceMetadataMiddleware_opDeleteResponseHeadersPolicy(region string) *
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "DeleteResponseHeadersPolicy",
 	}
 }

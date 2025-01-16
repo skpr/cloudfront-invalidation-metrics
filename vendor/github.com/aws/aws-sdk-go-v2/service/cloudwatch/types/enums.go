@@ -2,6 +2,27 @@
 
 package types
 
+type ActionsSuppressedBy string
+
+// Enum values for ActionsSuppressedBy
+const (
+	ActionsSuppressedByWaitPeriod      ActionsSuppressedBy = "WaitPeriod"
+	ActionsSuppressedByExtensionPeriod ActionsSuppressedBy = "ExtensionPeriod"
+	ActionsSuppressedByAlarm           ActionsSuppressedBy = "Alarm"
+)
+
+// Values returns all known values for ActionsSuppressedBy. Note that this can be
+// expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (ActionsSuppressedBy) Values() []ActionsSuppressedBy {
+	return []ActionsSuppressedBy{
+		"WaitPeriod",
+		"ExtensionPeriod",
+		"Alarm",
+	}
+}
+
 type AlarmType string
 
 // Enum values for AlarmType
@@ -10,9 +31,10 @@ const (
 	AlarmTypeMetricAlarm    AlarmType = "MetricAlarm"
 )
 
-// Values returns all known values for AlarmType. Note that this can be expanded in
-// the future, and so it is only as up to date as the client. The ordering of this
-// slice is not guaranteed to be stable across updates.
+// Values returns all known values for AlarmType. Note that this can be expanded
+// in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (AlarmType) Values() []AlarmType {
 	return []AlarmType{
 		"CompositeAlarm",
@@ -31,6 +53,7 @@ const (
 
 // Values returns all known values for AnomalyDetectorStateValue. Note that this
 // can be expanded in the future, and so it is only as up to date as the client.
+//
 // The ordering of this slice is not guaranteed to be stable across updates.
 func (AnomalyDetectorStateValue) Values() []AnomalyDetectorStateValue {
 	return []AnomalyDetectorStateValue{
@@ -49,8 +72,9 @@ const (
 )
 
 // Values returns all known values for AnomalyDetectorType. Note that this can be
-// expanded in the future, and so it is only as up to date as the client. The
-// ordering of this slice is not guaranteed to be stable across updates.
+// expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (AnomalyDetectorType) Values() []AnomalyDetectorType {
 	return []AnomalyDetectorType{
 		"SINGLE_METRIC",
@@ -72,8 +96,9 @@ const (
 )
 
 // Values returns all known values for ComparisonOperator. Note that this can be
-// expanded in the future, and so it is only as up to date as the client. The
-// ordering of this slice is not guaranteed to be stable across updates.
+// expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (ComparisonOperator) Values() []ComparisonOperator {
 	return []ComparisonOperator{
 		"GreaterThanOrEqualToThreshold",
@@ -83,6 +108,23 @@ func (ComparisonOperator) Values() []ComparisonOperator {
 		"LessThanLowerOrGreaterThanUpperThreshold",
 		"LessThanLowerThreshold",
 		"GreaterThanUpperThreshold",
+	}
+}
+
+type EvaluationState string
+
+// Enum values for EvaluationState
+const (
+	EvaluationStatePartialData EvaluationState = "PARTIAL_DATA"
+)
+
+// Values returns all known values for EvaluationState. Note that this can be
+// expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
+func (EvaluationState) Values() []EvaluationState {
+	return []EvaluationState{
+		"PARTIAL_DATA",
 	}
 }
 
@@ -96,8 +138,9 @@ const (
 )
 
 // Values returns all known values for HistoryItemType. Note that this can be
-// expanded in the future, and so it is only as up to date as the client. The
-// ordering of this slice is not guaranteed to be stable across updates.
+// expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (HistoryItemType) Values() []HistoryItemType {
 	return []HistoryItemType{
 		"ConfigurationUpdate",
@@ -112,15 +155,18 @@ type MetricStreamOutputFormat string
 const (
 	MetricStreamOutputFormatJson            MetricStreamOutputFormat = "json"
 	MetricStreamOutputFormatOpenTelemetry07 MetricStreamOutputFormat = "opentelemetry0.7"
+	MetricStreamOutputFormatOpenTelemetry10 MetricStreamOutputFormat = "opentelemetry1.0"
 )
 
-// Values returns all known values for MetricStreamOutputFormat. Note that this can
-// be expanded in the future, and so it is only as up to date as the client. The
-// ordering of this slice is not guaranteed to be stable across updates.
+// Values returns all known values for MetricStreamOutputFormat. Note that this
+// can be expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (MetricStreamOutputFormat) Values() []MetricStreamOutputFormat {
 	return []MetricStreamOutputFormat{
 		"json",
 		"opentelemetry0.7",
+		"opentelemetry1.0",
 	}
 }
 
@@ -132,8 +178,9 @@ const (
 )
 
 // Values returns all known values for RecentlyActive. Note that this can be
-// expanded in the future, and so it is only as up to date as the client. The
-// ordering of this slice is not guaranteed to be stable across updates.
+// expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (RecentlyActive) Values() []RecentlyActive {
 	return []RecentlyActive{
 		"PT3H",
@@ -149,8 +196,9 @@ const (
 )
 
 // Values returns all known values for ScanBy. Note that this can be expanded in
-// the future, and so it is only as up to date as the client. The ordering of this
-// slice is not guaranteed to be stable across updates.
+// the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (ScanBy) Values() []ScanBy {
 	return []ScanBy{
 		"TimestampDescending",
@@ -191,9 +239,10 @@ const (
 	StandardUnitNone            StandardUnit = "None"
 )
 
-// Values returns all known values for StandardUnit. Note that this can be expanded
-// in the future, and so it is only as up to date as the client. The ordering of
-// this slice is not guaranteed to be stable across updates.
+// Values returns all known values for StandardUnit. Note that this can be
+// expanded in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (StandardUnit) Values() []StandardUnit {
 	return []StandardUnit{
 		"Seconds",
@@ -236,8 +285,9 @@ const (
 )
 
 // Values returns all known values for StateValue. Note that this can be expanded
-// in the future, and so it is only as up to date as the client. The ordering of
-// this slice is not guaranteed to be stable across updates.
+// in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (StateValue) Values() []StateValue {
 	return []StateValue{
 		"OK",
@@ -257,9 +307,10 @@ const (
 	StatisticMaximum     Statistic = "Maximum"
 )
 
-// Values returns all known values for Statistic. Note that this can be expanded in
-// the future, and so it is only as up to date as the client. The ordering of this
-// slice is not guaranteed to be stable across updates.
+// Values returns all known values for Statistic. Note that this can be expanded
+// in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (Statistic) Values() []Statistic {
 	return []Statistic{
 		"SampleCount",
@@ -277,15 +328,18 @@ const (
 	StatusCodeComplete      StatusCode = "Complete"
 	StatusCodeInternalError StatusCode = "InternalError"
 	StatusCodePartialData   StatusCode = "PartialData"
+	StatusCodeForbidden     StatusCode = "Forbidden"
 )
 
 // Values returns all known values for StatusCode. Note that this can be expanded
-// in the future, and so it is only as up to date as the client. The ordering of
-// this slice is not guaranteed to be stable across updates.
+// in the future, and so it is only as up to date as the client.
+//
+// The ordering of this slice is not guaranteed to be stable across updates.
 func (StatusCode) Values() []StatusCode {
 	return []StatusCode{
 		"Complete",
 		"InternalError",
 		"PartialData",
+		"Forbidden",
 	}
 }

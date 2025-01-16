@@ -4,20 +4,21 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Gets a response headers policy, including metadata (the policy’s identifier and
-// the date and time when the policy was last modified). To get a response headers
-// policy, you must provide the policy’s identifier. If the response headers policy
-// is attached to a distribution’s cache behavior, you can get the policy’s
-// identifier using ListDistributions or GetDistribution. If the response headers
-// policy is not attached to a cache behavior, you can get the identifier using
-// ListResponseHeadersPolicies.
+// Gets a response headers policy, including metadata (the policy's identifier and
+// the date and time when the policy was last modified).
+//
+// To get a response headers policy, you must provide the policy's identifier. If
+// the response headers policy is attached to a distribution's cache behavior, you
+// can get the policy's identifier using ListDistributions or GetDistribution . If
+// the response headers policy is not attached to a cache behavior, you can get the
+// identifier using ListResponseHeadersPolicies .
 func (c *Client) GetResponseHeadersPolicy(ctx context.Context, params *GetResponseHeadersPolicyInput, optFns ...func(*Options)) (*GetResponseHeadersPolicyOutput, error) {
 	if params == nil {
 		params = &GetResponseHeadersPolicyInput{}
@@ -35,11 +36,12 @@ func (c *Client) GetResponseHeadersPolicy(ctx context.Context, params *GetRespon
 
 type GetResponseHeadersPolicyInput struct {
 
-	// The identifier for the response headers policy. If the response headers policy
-	// is attached to a distribution’s cache behavior, you can get the policy’s
-	// identifier using ListDistributions or GetDistribution. If the response headers
-	// policy is not attached to a cache behavior, you can get the identifier using
-	// ListResponseHeadersPolicies.
+	// The identifier for the response headers policy.
+	//
+	// If the response headers policy is attached to a distribution's cache behavior,
+	// you can get the policy's identifier using ListDistributions or GetDistribution .
+	// If the response headers policy is not attached to a cache behavior, you can get
+	// the identifier using ListResponseHeadersPolicies .
 	//
 	// This member is required.
 	Id *string
@@ -62,6 +64,9 @@ type GetResponseHeadersPolicyOutput struct {
 }
 
 func (c *Client) addOperationGetResponseHeadersPolicyMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpGetResponseHeadersPolicy{}, middleware.After)
 	if err != nil {
 		return err
@@ -70,34 +75,41 @@ func (c *Client) addOperationGetResponseHeadersPolicyMiddlewares(stack *middlewa
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "GetResponseHeadersPolicy"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -106,10 +118,22 @@ func (c *Client) addOperationGetResponseHeadersPolicyMiddlewares(stack *middlewa
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpGetResponseHeadersPolicyValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opGetResponseHeadersPolicy(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -121,6 +145,21 @@ func (c *Client) addOperationGetResponseHeadersPolicyMiddlewares(stack *middlewa
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -128,7 +167,6 @@ func newServiceMetadataMiddleware_opGetResponseHeadersPolicy(region string) *aws
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "GetResponseHeadersPolicy",
 	}
 }

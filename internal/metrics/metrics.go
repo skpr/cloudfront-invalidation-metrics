@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
-	cloudwatchclient "cloudfront-invalidation-metrics/internal/aws/cloudwatch"
+	cloudwatchclient "github.com/skpr/cloudfront-invalidation-metrics/internal/aws/cloudwatch"
 )
 
 const (
@@ -24,14 +24,14 @@ type ClientInterface interface {
 
 // Client for pushing metrics to CloudWatch.
 type Client struct {
-	CloudWatch cloudwatchclient.CloudWatchClientInterface
+	CloudWatch cloudwatchclient.ClientInterface
 	Namespace  string
 	Data       []types.MetricDatum
 	DryRun     bool
 }
 
 // New client for pushing metrics to CloudWatch.
-func New(cloudwatch cloudwatchclient.CloudWatchClientInterface, namespace string, dryRun bool) (*Client, error) {
+func New(cloudwatch cloudwatchclient.ClientInterface, namespace string, dryRun bool) (*Client, error) {
 	return &Client{
 		CloudWatch: cloudwatch,
 		Namespace:  namespace,

@@ -11,6 +11,8 @@ import (
 type AccessDenied struct {
 	Message *string
 
+	ErrorCodeOverride *string
+
 	noSmithyDocumentSerde
 }
 
@@ -23,12 +25,19 @@ func (e *AccessDenied) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *AccessDenied) ErrorCode() string             { return "AccessDenied" }
+func (e *AccessDenied) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "AccessDenied"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *AccessDenied) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Invalidation batch specified is too large.
 type BatchTooLarge struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -42,13 +51,20 @@ func (e *BatchTooLarge) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *BatchTooLarge) ErrorCode() string             { return "BatchTooLarge" }
+func (e *BatchTooLarge) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "BatchTooLarge"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *BatchTooLarge) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// A cache policy with this name already exists. You must provide a unique name. To
-// modify an existing cache policy, use UpdateCachePolicy.
+// A cache policy with this name already exists. You must provide a unique name.
+// To modify an existing cache policy, use UpdateCachePolicy .
 type CachePolicyAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -62,13 +78,20 @@ func (e *CachePolicyAlreadyExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *CachePolicyAlreadyExists) ErrorCode() string             { return "CachePolicyAlreadyExists" }
+func (e *CachePolicyAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CachePolicyAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *CachePolicyAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Cannot delete the cache policy because it is attached to one or more cache
 // behaviors.
 type CachePolicyInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -82,12 +105,19 @@ func (e *CachePolicyInUse) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *CachePolicyInUse) ErrorCode() string             { return "CachePolicyInUse" }
+func (e *CachePolicyInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CachePolicyInUse"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *CachePolicyInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You can't change the value of a public key.
 type CannotChangeImmutablePublicKeyFields struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -102,11 +132,66 @@ func (e *CannotChangeImmutablePublicKeyFields) ErrorMessage() string {
 	return *e.Message
 }
 func (e *CannotChangeImmutablePublicKeyFields) ErrorCode() string {
-	return "CannotChangeImmutablePublicKeyFields"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CannotChangeImmutablePublicKeyFields"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *CannotChangeImmutablePublicKeyFields) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
+
+// The entity cannot be deleted while it is in use.
+type CannotDeleteEntityWhileInUse struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *CannotDeleteEntityWhileInUse) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *CannotDeleteEntityWhileInUse) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *CannotDeleteEntityWhileInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CannotDeleteEntityWhileInUse"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *CannotDeleteEntityWhileInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The entity cannot be updated while it is in use.
+type CannotUpdateEntityWhileInUse struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *CannotUpdateEntityWhileInUse) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *CannotUpdateEntityWhileInUse) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *CannotUpdateEntityWhileInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CannotUpdateEntityWhileInUse"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *CannotUpdateEntityWhileInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // If the CallerReference is a value you already sent in a previous request to
 // create an identity but the content of the CloudFrontOriginAccessIdentityConfig
@@ -114,6 +199,8 @@ func (e *CannotChangeImmutablePublicKeyFields) ErrorFault() smithy.ErrorFault {
 // CloudFrontOriginAccessIdentityAlreadyExists error.
 type CloudFrontOriginAccessIdentityAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -128,7 +215,10 @@ func (e *CloudFrontOriginAccessIdentityAlreadyExists) ErrorMessage() string {
 	return *e.Message
 }
 func (e *CloudFrontOriginAccessIdentityAlreadyExists) ErrorCode() string {
-	return "CloudFrontOriginAccessIdentityAlreadyExists"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CloudFrontOriginAccessIdentityAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *CloudFrontOriginAccessIdentityAlreadyExists) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -137,6 +227,8 @@ func (e *CloudFrontOriginAccessIdentityAlreadyExists) ErrorFault() smithy.ErrorF
 // The Origin Access Identity specified is already in use.
 type CloudFrontOriginAccessIdentityInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -151,7 +243,10 @@ func (e *CloudFrontOriginAccessIdentityInUse) ErrorMessage() string {
 	return *e.Message
 }
 func (e *CloudFrontOriginAccessIdentityInUse) ErrorCode() string {
-	return "CloudFrontOriginAccessIdentityInUse"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CloudFrontOriginAccessIdentityInUse"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *CloudFrontOriginAccessIdentityInUse) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -160,6 +255,8 @@ func (e *CloudFrontOriginAccessIdentityInUse) ErrorFault() smithy.ErrorFault {
 // The CNAME specified is already defined for CloudFront.
 type CNAMEAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -173,13 +270,75 @@ func (e *CNAMEAlreadyExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *CNAMEAlreadyExists) ErrorCode() string             { return "CNAMEAlreadyExists" }
+func (e *CNAMEAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "CNAMEAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *CNAMEAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// The caller reference you attempted to create the distribution with is associated
-// with another distribution.
+// A continuous deployment policy with this configuration already exists.
+type ContinuousDeploymentPolicyAlreadyExists struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *ContinuousDeploymentPolicyAlreadyExists) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *ContinuousDeploymentPolicyAlreadyExists) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *ContinuousDeploymentPolicyAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "ContinuousDeploymentPolicyAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *ContinuousDeploymentPolicyAlreadyExists) ErrorFault() smithy.ErrorFault {
+	return smithy.FaultClient
+}
+
+// You cannot delete a continuous deployment policy that is associated with a
+// primary distribution.
+type ContinuousDeploymentPolicyInUse struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *ContinuousDeploymentPolicyInUse) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *ContinuousDeploymentPolicyInUse) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *ContinuousDeploymentPolicyInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "ContinuousDeploymentPolicyInUse"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *ContinuousDeploymentPolicyInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The caller reference you attempted to create the distribution with is
+// associated with another distribution.
 type DistributionAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -193,13 +352,20 @@ func (e *DistributionAlreadyExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *DistributionAlreadyExists) ErrorCode() string             { return "DistributionAlreadyExists" }
+func (e *DistributionAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "DistributionAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *DistributionAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified CloudFront distribution is not disabled. You must disable the
 // distribution before you can delete it.
 type DistributionNotDisabled struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -213,12 +379,123 @@ func (e *DistributionNotDisabled) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *DistributionNotDisabled) ErrorCode() string             { return "DistributionNotDisabled" }
+func (e *DistributionNotDisabled) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "DistributionNotDisabled"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *DistributionNotDisabled) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The entity already exists. You must provide a unique entity.
+type EntityAlreadyExists struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *EntityAlreadyExists) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *EntityAlreadyExists) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *EntityAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "EntityAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *EntityAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The entity limit has been exceeded.
+type EntityLimitExceeded struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *EntityLimitExceeded) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *EntityLimitExceeded) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *EntityLimitExceeded) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "EntityLimitExceeded"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *EntityLimitExceeded) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The entity was not found.
+type EntityNotFound struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *EntityNotFound) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *EntityNotFound) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *EntityNotFound) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "EntityNotFound"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *EntityNotFound) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The entity size limit was exceeded.
+type EntitySizeLimitExceeded struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *EntitySizeLimitExceeded) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *EntitySizeLimitExceeded) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *EntitySizeLimitExceeded) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "EntitySizeLimitExceeded"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *EntitySizeLimitExceeded) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified configuration for field-level encryption already exists.
 type FieldLevelEncryptionConfigAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -233,7 +510,10 @@ func (e *FieldLevelEncryptionConfigAlreadyExists) ErrorMessage() string {
 	return *e.Message
 }
 func (e *FieldLevelEncryptionConfigAlreadyExists) ErrorCode() string {
-	return "FieldLevelEncryptionConfigAlreadyExists"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FieldLevelEncryptionConfigAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *FieldLevelEncryptionConfigAlreadyExists) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -242,6 +522,8 @@ func (e *FieldLevelEncryptionConfigAlreadyExists) ErrorFault() smithy.ErrorFault
 // The specified configuration for field-level encryption is in use.
 type FieldLevelEncryptionConfigInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -256,13 +538,18 @@ func (e *FieldLevelEncryptionConfigInUse) ErrorMessage() string {
 	return *e.Message
 }
 func (e *FieldLevelEncryptionConfigInUse) ErrorCode() string {
-	return "FieldLevelEncryptionConfigInUse"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FieldLevelEncryptionConfigInUse"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *FieldLevelEncryptionConfigInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified profile for field-level encryption already exists.
 type FieldLevelEncryptionProfileAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -277,7 +564,10 @@ func (e *FieldLevelEncryptionProfileAlreadyExists) ErrorMessage() string {
 	return *e.Message
 }
 func (e *FieldLevelEncryptionProfileAlreadyExists) ErrorCode() string {
-	return "FieldLevelEncryptionProfileAlreadyExists"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FieldLevelEncryptionProfileAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *FieldLevelEncryptionProfileAlreadyExists) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -286,6 +576,8 @@ func (e *FieldLevelEncryptionProfileAlreadyExists) ErrorFault() smithy.ErrorFaul
 // The specified profile for field-level encryption is in use.
 type FieldLevelEncryptionProfileInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -300,13 +592,18 @@ func (e *FieldLevelEncryptionProfileInUse) ErrorMessage() string {
 	return *e.Message
 }
 func (e *FieldLevelEncryptionProfileInUse) ErrorCode() string {
-	return "FieldLevelEncryptionProfileInUse"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FieldLevelEncryptionProfileInUse"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *FieldLevelEncryptionProfileInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The maximum size of a profile for field-level encryption was exceeded.
 type FieldLevelEncryptionProfileSizeExceeded struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -321,7 +618,10 @@ func (e *FieldLevelEncryptionProfileSizeExceeded) ErrorMessage() string {
 	return *e.Message
 }
 func (e *FieldLevelEncryptionProfileSizeExceeded) ErrorCode() string {
-	return "FieldLevelEncryptionProfileSizeExceeded"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FieldLevelEncryptionProfileSizeExceeded"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *FieldLevelEncryptionProfileSizeExceeded) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -329,9 +629,11 @@ func (e *FieldLevelEncryptionProfileSizeExceeded) ErrorFault() smithy.ErrorFault
 
 // A function with the same name already exists in this Amazon Web Services
 // account. To create a function, you must provide a unique name. To update an
-// existing function, use UpdateFunction.
+// existing function, use UpdateFunction .
 type FunctionAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -345,12 +647,19 @@ func (e *FunctionAlreadyExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *FunctionAlreadyExists) ErrorCode() string             { return "FunctionAlreadyExists" }
+func (e *FunctionAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FunctionAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *FunctionAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// Cannot delete the function because it’s attached to one or more cache behaviors.
+// Cannot delete the function because it's attached to one or more cache behaviors.
 type FunctionInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -364,14 +673,22 @@ func (e *FunctionInUse) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *FunctionInUse) ErrorCode() string             { return "FunctionInUse" }
+func (e *FunctionInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FunctionInUse"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *FunctionInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// The function is too large. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// The function is too large. For more information, see [Quotas] (formerly known as
+// limits) in the Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type FunctionSizeLimitExceeded struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -385,12 +702,19 @@ func (e *FunctionSizeLimitExceeded) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *FunctionSizeLimitExceeded) ErrorCode() string             { return "FunctionSizeLimitExceeded" }
+func (e *FunctionSizeLimitExceeded) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "FunctionSizeLimitExceeded"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *FunctionSizeLimitExceeded) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// You cannot delete a managed policy.
+// Deletion is not allowed for this entity.
 type IllegalDelete struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -404,13 +728,20 @@ func (e *IllegalDelete) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *IllegalDelete) ErrorCode() string             { return "IllegalDelete" }
+func (e *IllegalDelete) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "IllegalDelete"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *IllegalDelete) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified configuration for field-level encryption can't be associated with
 // the specified cache behavior.
 type IllegalFieldLevelEncryptionConfigAssociationWithCacheBehavior struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -425,15 +756,47 @@ func (e *IllegalFieldLevelEncryptionConfigAssociationWithCacheBehavior) ErrorMes
 	return *e.Message
 }
 func (e *IllegalFieldLevelEncryptionConfigAssociationWithCacheBehavior) ErrorCode() string {
-	return "IllegalFieldLevelEncryptionConfigAssociationWithCacheBehavior"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "IllegalFieldLevelEncryptionConfigAssociationWithCacheBehavior"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *IllegalFieldLevelEncryptionConfigAssociationWithCacheBehavior) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
+// An origin cannot contain both an origin access control (OAC) and an origin
+// access identity (OAI).
+type IllegalOriginAccessConfiguration struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *IllegalOriginAccessConfiguration) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *IllegalOriginAccessConfiguration) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *IllegalOriginAccessConfiguration) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "IllegalOriginAccessConfiguration"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *IllegalOriginAccessConfiguration) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
 // The update contains modifications that are not allowed.
 type IllegalUpdate struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -447,12 +810,19 @@ func (e *IllegalUpdate) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *IllegalUpdate) ErrorCode() string             { return "IllegalUpdate" }
+func (e *IllegalUpdate) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "IllegalUpdate"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *IllegalUpdate) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The value of Quantity and the size of Items don't match.
 type InconsistentQuantities struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -466,12 +836,19 @@ func (e *InconsistentQuantities) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InconsistentQuantities) ErrorCode() string             { return "InconsistentQuantities" }
+func (e *InconsistentQuantities) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InconsistentQuantities"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InconsistentQuantities) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // An argument is invalid.
 type InvalidArgument struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -485,12 +862,19 @@ func (e *InvalidArgument) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidArgument) ErrorCode() string             { return "InvalidArgument" }
+func (e *InvalidArgument) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidArgument"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidArgument) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The default root object file name is too big or contains an invalid character.
 type InvalidDefaultRootObject struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -504,12 +888,48 @@ func (e *InvalidDefaultRootObject) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidDefaultRootObject) ErrorCode() string             { return "InvalidDefaultRootObject" }
+func (e *InvalidDefaultRootObject) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidDefaultRootObject"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidDefaultRootObject) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// An origin access control is associated with an origin whose domain name is not
+// supported.
+type InvalidDomainNameForOriginAccessControl struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *InvalidDomainNameForOriginAccessControl) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *InvalidDomainNameForOriginAccessControl) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *InvalidDomainNameForOriginAccessControl) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidDomainNameForOriginAccessControl"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *InvalidDomainNameForOriginAccessControl) ErrorFault() smithy.ErrorFault {
+	return smithy.FaultClient
+}
 
 // An invalid error code was specified.
 type InvalidErrorCode struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -523,7 +943,12 @@ func (e *InvalidErrorCode) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidErrorCode) ErrorCode() string             { return "InvalidErrorCode" }
+func (e *InvalidErrorCode) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidErrorCode"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidErrorCode) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Your request contains forward cookies option which doesn't match with the
@@ -532,6 +957,8 @@ func (e *InvalidErrorCode) ErrorFault() smithy.ErrorFault { return smithy.FaultC
 // when expected.
 type InvalidForwardCookies struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -545,12 +972,19 @@ func (e *InvalidForwardCookies) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidForwardCookies) ErrorCode() string             { return "InvalidForwardCookies" }
+func (e *InvalidForwardCookies) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidForwardCookies"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidForwardCookies) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A CloudFront function association is invalid.
 type InvalidFunctionAssociation struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -564,12 +998,19 @@ func (e *InvalidFunctionAssociation) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidFunctionAssociation) ErrorCode() string             { return "InvalidFunctionAssociation" }
+func (e *InvalidFunctionAssociation) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidFunctionAssociation"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidFunctionAssociation) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified geo restriction parameter is not valid.
 type InvalidGeoRestrictionParameter struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -583,12 +1024,19 @@ func (e *InvalidGeoRestrictionParameter) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidGeoRestrictionParameter) ErrorCode() string             { return "InvalidGeoRestrictionParameter" }
+func (e *InvalidGeoRestrictionParameter) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidGeoRestrictionParameter"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidGeoRestrictionParameter) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The headers specified are not valid for an Amazon S3 origin.
 type InvalidHeadersForS3Origin struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -602,12 +1050,19 @@ func (e *InvalidHeadersForS3Origin) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidHeadersForS3Origin) ErrorCode() string             { return "InvalidHeadersForS3Origin" }
+func (e *InvalidHeadersForS3Origin) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidHeadersForS3Origin"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidHeadersForS3Origin) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The If-Match version is missing or not valid.
 type InvalidIfMatchVersion struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -621,12 +1076,19 @@ func (e *InvalidIfMatchVersion) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidIfMatchVersion) ErrorCode() string             { return "InvalidIfMatchVersion" }
+func (e *InvalidIfMatchVersion) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidIfMatchVersion"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidIfMatchVersion) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified Lambda@Edge function association is invalid.
 type InvalidLambdaFunctionAssociation struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -641,13 +1103,18 @@ func (e *InvalidLambdaFunctionAssociation) ErrorMessage() string {
 	return *e.Message
 }
 func (e *InvalidLambdaFunctionAssociation) ErrorCode() string {
-	return "InvalidLambdaFunctionAssociation"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidLambdaFunctionAssociation"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *InvalidLambdaFunctionAssociation) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The location code specified is not valid.
 type InvalidLocationCode struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -661,12 +1128,19 @@ func (e *InvalidLocationCode) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidLocationCode) ErrorCode() string             { return "InvalidLocationCode" }
+func (e *InvalidLocationCode) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidLocationCode"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidLocationCode) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The minimum protocol version specified is not valid.
 type InvalidMinimumProtocolVersion struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -680,13 +1154,20 @@ func (e *InvalidMinimumProtocolVersion) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidMinimumProtocolVersion) ErrorCode() string             { return "InvalidMinimumProtocolVersion" }
+func (e *InvalidMinimumProtocolVersion) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidMinimumProtocolVersion"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidMinimumProtocolVersion) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The Amazon S3 origin server specified does not refer to a valid Amazon S3
 // bucket.
 type InvalidOrigin struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -700,12 +1181,45 @@ func (e *InvalidOrigin) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidOrigin) ErrorCode() string             { return "InvalidOrigin" }
+func (e *InvalidOrigin) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidOrigin"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidOrigin) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The origin access control is not valid.
+type InvalidOriginAccessControl struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *InvalidOriginAccessControl) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *InvalidOriginAccessControl) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *InvalidOriginAccessControl) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidOriginAccessControl"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *InvalidOriginAccessControl) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The origin access identity is not valid or doesn't exist.
 type InvalidOriginAccessIdentity struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -719,12 +1233,19 @@ func (e *InvalidOriginAccessIdentity) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidOriginAccessIdentity) ErrorCode() string             { return "InvalidOriginAccessIdentity" }
+func (e *InvalidOriginAccessIdentity) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidOriginAccessIdentity"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidOriginAccessIdentity) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The keep alive timeout specified for the origin is not valid.
 type InvalidOriginKeepaliveTimeout struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -738,12 +1259,19 @@ func (e *InvalidOriginKeepaliveTimeout) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidOriginKeepaliveTimeout) ErrorCode() string             { return "InvalidOriginKeepaliveTimeout" }
+func (e *InvalidOriginKeepaliveTimeout) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidOriginKeepaliveTimeout"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidOriginKeepaliveTimeout) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The read timeout specified for the origin is not valid.
 type InvalidOriginReadTimeout struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -757,13 +1285,20 @@ func (e *InvalidOriginReadTimeout) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidOriginReadTimeout) ErrorCode() string             { return "InvalidOriginReadTimeout" }
+func (e *InvalidOriginReadTimeout) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidOriginReadTimeout"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidOriginReadTimeout) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You cannot specify SSLv3 as the minimum protocol version if you only want to
 // support only clients that support Server Name Indication (SNI).
 type InvalidProtocolSettings struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -777,12 +1312,19 @@ func (e *InvalidProtocolSettings) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidProtocolSettings) ErrorCode() string             { return "InvalidProtocolSettings" }
+func (e *InvalidProtocolSettings) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidProtocolSettings"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidProtocolSettings) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The query string parameters specified are not valid.
 type InvalidQueryStringParameters struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -796,13 +1338,20 @@ func (e *InvalidQueryStringParameters) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidQueryStringParameters) ErrorCode() string             { return "InvalidQueryStringParameters" }
+func (e *InvalidQueryStringParameters) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidQueryStringParameters"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidQueryStringParameters) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// The relative path is too big, is not URL-encoded, or does not begin with a slash
-// (/).
+// The relative path is too big, is not URL-encoded, or does not begin with a
+// slash (/).
 type InvalidRelativePath struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -816,7 +1365,12 @@ func (e *InvalidRelativePath) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidRelativePath) ErrorCode() string             { return "InvalidRelativePath" }
+func (e *InvalidRelativePath) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidRelativePath"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidRelativePath) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // This operation requires the HTTPS protocol. Ensure that you specify the HTTPS
@@ -824,6 +1378,8 @@ func (e *InvalidRelativePath) ErrorFault() smithy.ErrorFault { return smithy.Fau
 // distribution configuration.
 type InvalidRequiredProtocol struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -837,12 +1393,19 @@ func (e *InvalidRequiredProtocol) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidRequiredProtocol) ErrorCode() string             { return "InvalidRequiredProtocol" }
+func (e *InvalidRequiredProtocol) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidRequiredProtocol"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidRequiredProtocol) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A response code is not valid.
 type InvalidResponseCode struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -856,12 +1419,19 @@ func (e *InvalidResponseCode) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidResponseCode) ErrorCode() string             { return "InvalidResponseCode" }
+func (e *InvalidResponseCode) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidResponseCode"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidResponseCode) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The tagging specified is not valid.
 type InvalidTagging struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -875,12 +1445,19 @@ func (e *InvalidTagging) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidTagging) ErrorCode() string             { return "InvalidTagging" }
+func (e *InvalidTagging) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidTagging"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidTagging) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The TTL order specified is not valid.
 type InvalidTTLOrder struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -894,12 +1471,19 @@ func (e *InvalidTTLOrder) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidTTLOrder) ErrorCode() string             { return "InvalidTTLOrder" }
+func (e *InvalidTTLOrder) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidTTLOrder"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidTTLOrder) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A viewer certificate specified is not valid.
 type InvalidViewerCertificate struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -913,16 +1497,23 @@ func (e *InvalidViewerCertificate) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidViewerCertificate) ErrorCode() string             { return "InvalidViewerCertificate" }
+func (e *InvalidViewerCertificate) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidViewerCertificate"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidViewerCertificate) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A web ACL ID specified is not valid. To specify a web ACL created using the
 // latest version of WAF, use the ACL ARN, for example
-// arn:aws:wafv2:us-east-1:123456789012:global/webacl/ExampleWebACL/473e64fd-f30b-4765-81a0-62ad96dd167a.
-// To specify a web ACL created using WAF Classic, use the ACL ID, for example
-// 473e64fd-f30b-4765-81a0-62ad96dd167a.
+// arn:aws:wafv2:us-east-1:123456789012:global/webacl/ExampleWebACL/473e64fd-f30b-4765-81a0-62ad96dd167a
+// . To specify a web ACL created using WAF Classic, use the ACL ID, for example
+// 473e64fd-f30b-4765-81a0-62ad96dd167a .
 type InvalidWebACLId struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -936,13 +1527,20 @@ func (e *InvalidWebACLId) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *InvalidWebACLId) ErrorCode() string             { return "InvalidWebACLId" }
+func (e *InvalidWebACLId) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "InvalidWebACLId"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *InvalidWebACLId) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A key group with this name already exists. You must provide a unique name. To
-// modify an existing key group, use UpdateKeyGroup.
+// modify an existing key group, use UpdateKeyGroup .
 type KeyGroupAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -956,13 +1554,20 @@ func (e *KeyGroupAlreadyExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *KeyGroupAlreadyExists) ErrorCode() string             { return "KeyGroupAlreadyExists" }
+func (e *KeyGroupAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "KeyGroupAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *KeyGroupAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // This operation requires a body. Ensure that the body is present and the
 // Content-Type header is set.
 type MissingBody struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -976,12 +1581,47 @@ func (e *MissingBody) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *MissingBody) ErrorCode() string             { return "MissingBody" }
+func (e *MissingBody) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "MissingBody"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *MissingBody) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// A monitoring subscription already exists for the specified distribution.
+type MonitoringSubscriptionAlreadyExists struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *MonitoringSubscriptionAlreadyExists) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *MonitoringSubscriptionAlreadyExists) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *MonitoringSubscriptionAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "MonitoringSubscriptionAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *MonitoringSubscriptionAlreadyExists) ErrorFault() smithy.ErrorFault {
+	return smithy.FaultClient
+}
 
 // The cache policy does not exist.
 type NoSuchCachePolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -995,12 +1635,19 @@ func (e *NoSuchCachePolicy) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchCachePolicy) ErrorCode() string             { return "NoSuchCachePolicy" }
+func (e *NoSuchCachePolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchCachePolicy"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchCachePolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified origin access identity does not exist.
 type NoSuchCloudFrontOriginAccessIdentity struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1015,15 +1662,46 @@ func (e *NoSuchCloudFrontOriginAccessIdentity) ErrorMessage() string {
 	return *e.Message
 }
 func (e *NoSuchCloudFrontOriginAccessIdentity) ErrorCode() string {
-	return "NoSuchCloudFrontOriginAccessIdentity"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchCloudFrontOriginAccessIdentity"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *NoSuchCloudFrontOriginAccessIdentity) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
+// The continuous deployment policy doesn't exist.
+type NoSuchContinuousDeploymentPolicy struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *NoSuchContinuousDeploymentPolicy) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *NoSuchContinuousDeploymentPolicy) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *NoSuchContinuousDeploymentPolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchContinuousDeploymentPolicy"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *NoSuchContinuousDeploymentPolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
 // The specified distribution does not exist.
 type NoSuchDistribution struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1037,12 +1715,19 @@ func (e *NoSuchDistribution) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchDistribution) ErrorCode() string             { return "NoSuchDistribution" }
+func (e *NoSuchDistribution) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchDistribution"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchDistribution) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified configuration for field-level encryption doesn't exist.
 type NoSuchFieldLevelEncryptionConfig struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1057,13 +1742,18 @@ func (e *NoSuchFieldLevelEncryptionConfig) ErrorMessage() string {
 	return *e.Message
 }
 func (e *NoSuchFieldLevelEncryptionConfig) ErrorCode() string {
-	return "NoSuchFieldLevelEncryptionConfig"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchFieldLevelEncryptionConfig"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *NoSuchFieldLevelEncryptionConfig) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified profile for field-level encryption doesn't exist.
 type NoSuchFieldLevelEncryptionProfile struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1078,13 +1768,18 @@ func (e *NoSuchFieldLevelEncryptionProfile) ErrorMessage() string {
 	return *e.Message
 }
 func (e *NoSuchFieldLevelEncryptionProfile) ErrorCode() string {
-	return "NoSuchFieldLevelEncryptionProfile"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchFieldLevelEncryptionProfile"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *NoSuchFieldLevelEncryptionProfile) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The function does not exist.
 type NoSuchFunctionExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1098,12 +1793,19 @@ func (e *NoSuchFunctionExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchFunctionExists) ErrorCode() string             { return "NoSuchFunctionExists" }
+func (e *NoSuchFunctionExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchFunctionExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchFunctionExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified invalidation does not exist.
 type NoSuchInvalidation struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1117,12 +1819,45 @@ func (e *NoSuchInvalidation) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchInvalidation) ErrorCode() string             { return "NoSuchInvalidation" }
+func (e *NoSuchInvalidation) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchInvalidation"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchInvalidation) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// No origin exists with the specified Origin Id.
+// A monitoring subscription does not exist for the specified distribution.
+type NoSuchMonitoringSubscription struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *NoSuchMonitoringSubscription) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *NoSuchMonitoringSubscription) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *NoSuchMonitoringSubscription) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchMonitoringSubscription"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *NoSuchMonitoringSubscription) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// No origin exists with the specified Origin Id .
 type NoSuchOrigin struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1136,12 +1871,45 @@ func (e *NoSuchOrigin) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchOrigin) ErrorCode() string             { return "NoSuchOrigin" }
+func (e *NoSuchOrigin) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchOrigin"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchOrigin) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The origin access control does not exist.
+type NoSuchOriginAccessControl struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *NoSuchOriginAccessControl) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *NoSuchOriginAccessControl) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *NoSuchOriginAccessControl) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchOriginAccessControl"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *NoSuchOriginAccessControl) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The origin request policy does not exist.
 type NoSuchOriginRequestPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1155,12 +1923,19 @@ func (e *NoSuchOriginRequestPolicy) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchOriginRequestPolicy) ErrorCode() string             { return "NoSuchOriginRequestPolicy" }
+func (e *NoSuchOriginRequestPolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchOriginRequestPolicy"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchOriginRequestPolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified public key doesn't exist.
 type NoSuchPublicKey struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1174,12 +1949,19 @@ func (e *NoSuchPublicKey) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchPublicKey) ErrorCode() string             { return "NoSuchPublicKey" }
+func (e *NoSuchPublicKey) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchPublicKey"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchPublicKey) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The real-time log configuration does not exist.
 type NoSuchRealtimeLogConfig struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1193,12 +1975,19 @@ func (e *NoSuchRealtimeLogConfig) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchRealtimeLogConfig) ErrorCode() string             { return "NoSuchRealtimeLogConfig" }
+func (e *NoSuchRealtimeLogConfig) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchRealtimeLogConfig"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchRealtimeLogConfig) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A resource that was specified is not valid.
 type NoSuchResource struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1212,12 +2001,19 @@ func (e *NoSuchResource) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchResource) ErrorCode() string             { return "NoSuchResource" }
+func (e *NoSuchResource) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchResource"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchResource) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The response headers policy does not exist.
 type NoSuchResponseHeadersPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1231,12 +2027,19 @@ func (e *NoSuchResponseHeadersPolicy) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchResponseHeadersPolicy) ErrorCode() string             { return "NoSuchResponseHeadersPolicy" }
+func (e *NoSuchResponseHeadersPolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchResponseHeadersPolicy"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchResponseHeadersPolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified streaming distribution does not exist.
 type NoSuchStreamingDistribution struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1250,14 +2053,74 @@ func (e *NoSuchStreamingDistribution) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *NoSuchStreamingDistribution) ErrorCode() string             { return "NoSuchStreamingDistribution" }
+func (e *NoSuchStreamingDistribution) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "NoSuchStreamingDistribution"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *NoSuchStreamingDistribution) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// An origin access control with the specified parameters already exists.
+type OriginAccessControlAlreadyExists struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *OriginAccessControlAlreadyExists) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *OriginAccessControlAlreadyExists) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *OriginAccessControlAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "OriginAccessControlAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *OriginAccessControlAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// Cannot delete the origin access control because it's in use by one or more
+// distributions.
+type OriginAccessControlInUse struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *OriginAccessControlInUse) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *OriginAccessControlInUse) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *OriginAccessControlInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "OriginAccessControlInUse"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *OriginAccessControlInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // An origin request policy with this name already exists. You must provide a
 // unique name. To modify an existing origin request policy, use
-// UpdateOriginRequestPolicy.
+// UpdateOriginRequestPolicy .
 type OriginRequestPolicyAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1272,7 +2135,10 @@ func (e *OriginRequestPolicyAlreadyExists) ErrorMessage() string {
 	return *e.Message
 }
 func (e *OriginRequestPolicyAlreadyExists) ErrorCode() string {
-	return "OriginRequestPolicyAlreadyExists"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "OriginRequestPolicyAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *OriginRequestPolicyAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
@@ -1280,6 +2146,8 @@ func (e *OriginRequestPolicyAlreadyExists) ErrorFault() smithy.ErrorFault { retu
 // cache behaviors.
 type OriginRequestPolicyInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1293,12 +2161,19 @@ func (e *OriginRequestPolicyInUse) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *OriginRequestPolicyInUse) ErrorCode() string             { return "OriginRequestPolicyInUse" }
+func (e *OriginRequestPolicyInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "OriginRequestPolicyInUse"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *OriginRequestPolicyInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// The precondition in one or more of the request fields evaluated to false.
+// The precondition in one or more of the request fields evaluated to false .
 type PreconditionFailed struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1312,12 +2187,19 @@ func (e *PreconditionFailed) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *PreconditionFailed) ErrorCode() string             { return "PreconditionFailed" }
+func (e *PreconditionFailed) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "PreconditionFailed"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *PreconditionFailed) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified public key already exists.
 type PublicKeyAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1331,12 +2213,19 @@ func (e *PublicKeyAlreadyExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *PublicKeyAlreadyExists) ErrorCode() string             { return "PublicKeyAlreadyExists" }
+func (e *PublicKeyAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "PublicKeyAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *PublicKeyAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified public key is in use.
 type PublicKeyInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1350,12 +2239,19 @@ func (e *PublicKeyInUse) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *PublicKeyInUse) ErrorCode() string             { return "PublicKeyInUse" }
+func (e *PublicKeyInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "PublicKeyInUse"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *PublicKeyInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // No profile specified for the field-level encryption query argument.
 type QueryArgProfileEmpty struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1369,14 +2265,21 @@ func (e *QueryArgProfileEmpty) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *QueryArgProfileEmpty) ErrorCode() string             { return "QueryArgProfileEmpty" }
+func (e *QueryArgProfileEmpty) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "QueryArgProfileEmpty"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *QueryArgProfileEmpty) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A real-time log configuration with this name already exists. You must provide a
 // unique name. To modify an existing real-time log configuration, use
-// UpdateRealtimeLogConfig.
+// UpdateRealtimeLogConfig .
 type RealtimeLogConfigAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1390,13 +2293,20 @@ func (e *RealtimeLogConfigAlreadyExists) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *RealtimeLogConfigAlreadyExists) ErrorCode() string             { return "RealtimeLogConfigAlreadyExists" }
+func (e *RealtimeLogConfigAlreadyExists) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "RealtimeLogConfigAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *RealtimeLogConfigAlreadyExists) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Cannot delete the real-time log configuration because it is attached to one or
 // more cache behaviors.
 type RealtimeLogConfigInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1410,13 +2320,20 @@ func (e *RealtimeLogConfigInUse) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *RealtimeLogConfigInUse) ErrorCode() string             { return "RealtimeLogConfigInUse" }
+func (e *RealtimeLogConfigInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "RealtimeLogConfigInUse"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *RealtimeLogConfigInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified real-time log configuration belongs to a different Amazon Web
 // Services account.
 type RealtimeLogConfigOwnerMismatch struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1430,12 +2347,19 @@ func (e *RealtimeLogConfigOwnerMismatch) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *RealtimeLogConfigOwnerMismatch) ErrorCode() string             { return "RealtimeLogConfigOwnerMismatch" }
+func (e *RealtimeLogConfigOwnerMismatch) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "RealtimeLogConfigOwnerMismatch"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *RealtimeLogConfigOwnerMismatch) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Cannot delete this resource because it is in use.
 type ResourceInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1449,14 +2373,21 @@ func (e *ResourceInUse) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *ResourceInUse) ErrorCode() string             { return "ResourceInUse" }
+func (e *ResourceInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "ResourceInUse"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *ResourceInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // A response headers policy with this name already exists. You must provide a
 // unique name. To modify an existing response headers policy, use
-// UpdateResponseHeadersPolicy.
+// UpdateResponseHeadersPolicy .
 type ResponseHeadersPolicyAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1471,7 +2402,10 @@ func (e *ResponseHeadersPolicyAlreadyExists) ErrorMessage() string {
 	return *e.Message
 }
 func (e *ResponseHeadersPolicyAlreadyExists) ErrorCode() string {
-	return "ResponseHeadersPolicyAlreadyExists"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "ResponseHeadersPolicyAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *ResponseHeadersPolicyAlreadyExists) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -1481,6 +2415,8 @@ func (e *ResponseHeadersPolicyAlreadyExists) ErrorFault() smithy.ErrorFault {
 // cache behaviors in a CloudFront distribution.
 type ResponseHeadersPolicyInUse struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1494,13 +2430,46 @@ func (e *ResponseHeadersPolicyInUse) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *ResponseHeadersPolicyInUse) ErrorCode() string             { return "ResponseHeadersPolicyInUse" }
+func (e *ResponseHeadersPolicyInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "ResponseHeadersPolicyInUse"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *ResponseHeadersPolicyInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// A continuous deployment policy for this staging distribution already exists.
+type StagingDistributionInUse struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *StagingDistributionInUse) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *StagingDistributionInUse) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *StagingDistributionInUse) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "StagingDistributionInUse"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *StagingDistributionInUse) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The caller reference you attempted to create the streaming distribution with is
 // associated with another distribution
 type StreamingDistributionAlreadyExists struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1515,7 +2484,10 @@ func (e *StreamingDistributionAlreadyExists) ErrorMessage() string {
 	return *e.Message
 }
 func (e *StreamingDistributionAlreadyExists) ErrorCode() string {
-	return "StreamingDistributionAlreadyExists"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "StreamingDistributionAlreadyExists"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *StreamingDistributionAlreadyExists) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -1525,6 +2497,8 @@ func (e *StreamingDistributionAlreadyExists) ErrorFault() smithy.ErrorFault {
 // distribution before you can delete it.
 type StreamingDistributionNotDisabled struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1539,13 +2513,18 @@ func (e *StreamingDistributionNotDisabled) ErrorMessage() string {
 	return *e.Message
 }
 func (e *StreamingDistributionNotDisabled) ErrorCode() string {
-	return "StreamingDistributionNotDisabled"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "StreamingDistributionNotDisabled"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *StreamingDistributionNotDisabled) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The CloudFront function failed.
 type TestFunctionFailed struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1559,12 +2538,51 @@ func (e *TestFunctionFailed) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TestFunctionFailed) ErrorCode() string             { return "TestFunctionFailed" }
+func (e *TestFunctionFailed) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TestFunctionFailed"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TestFunctionFailed) ErrorFault() smithy.ErrorFault { return smithy.FaultServer }
+
+// The length of the Content-Security-Policy header value in the response headers
+// policy exceeds the maximum.
+//
+// For more information, see [Quotas] (formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
+type TooLongCSPInResponseHeadersPolicy struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *TooLongCSPInResponseHeadersPolicy) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *TooLongCSPInResponseHeadersPolicy) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *TooLongCSPInResponseHeadersPolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooLongCSPInResponseHeadersPolicy"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *TooLongCSPInResponseHeadersPolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You cannot create more cache behaviors for the distribution.
 type TooManyCacheBehaviors struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1578,15 +2596,23 @@ func (e *TooManyCacheBehaviors) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyCacheBehaviors) ErrorCode() string             { return "TooManyCacheBehaviors" }
+func (e *TooManyCacheBehaviors) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCacheBehaviors"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyCacheBehaviors) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You have reached the maximum number of cache policies for this Amazon Web
-// Services account. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// Services account. For more information, see [Quotas](formerly known as limits) in the
+// Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyCachePolicies struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1600,12 +2626,19 @@ func (e *TooManyCachePolicies) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyCachePolicies) ErrorCode() string             { return "TooManyCachePolicies" }
+func (e *TooManyCachePolicies) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCachePolicies"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyCachePolicies) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You cannot create anymore custom SSL/TLS certificates.
 type TooManyCertificates struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1619,13 +2652,20 @@ func (e *TooManyCertificates) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyCertificates) ErrorCode() string             { return "TooManyCertificates" }
+func (e *TooManyCertificates) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCertificates"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyCertificates) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Processing your request would cause you to exceed the maximum number of origin
 // access identities allowed.
 type TooManyCloudFrontOriginAccessIdentities struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1640,9 +2680,41 @@ func (e *TooManyCloudFrontOriginAccessIdentities) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyCloudFrontOriginAccessIdentities) ErrorCode() string {
-	return "TooManyCloudFrontOriginAccessIdentities"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCloudFrontOriginAccessIdentities"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyCloudFrontOriginAccessIdentities) ErrorFault() smithy.ErrorFault {
+	return smithy.FaultClient
+}
+
+// You have reached the maximum number of continuous deployment policies for this
+// Amazon Web Services account.
+type TooManyContinuousDeploymentPolicies struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *TooManyContinuousDeploymentPolicies) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *TooManyContinuousDeploymentPolicies) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *TooManyContinuousDeploymentPolicies) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyContinuousDeploymentPolicies"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *TooManyContinuousDeploymentPolicies) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
@@ -1650,6 +2722,8 @@ func (e *TooManyCloudFrontOriginAccessIdentities) ErrorFault() smithy.ErrorFault
 // cache behavior.
 type TooManyCookieNamesInWhiteList struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1663,15 +2737,23 @@ func (e *TooManyCookieNamesInWhiteList) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyCookieNamesInWhiteList) ErrorCode() string             { return "TooManyCookieNamesInWhiteList" }
+func (e *TooManyCookieNamesInWhiteList) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCookieNamesInWhiteList"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyCookieNamesInWhiteList) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The number of cookies in the cache policy exceeds the maximum. For more
-// information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// information, see [Quotas](formerly known as limits) in the Amazon CloudFront Developer
+// Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyCookiesInCachePolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1685,15 +2767,23 @@ func (e *TooManyCookiesInCachePolicy) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyCookiesInCachePolicy) ErrorCode() string             { return "TooManyCookiesInCachePolicy" }
+func (e *TooManyCookiesInCachePolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCookiesInCachePolicy"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyCookiesInCachePolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// The number of cookies in the origin request policy exceeds the maximum. For more
-// information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// The number of cookies in the origin request policy exceeds the maximum. For
+// more information, see [Quotas](formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyCookiesInOriginRequestPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1708,18 +2798,25 @@ func (e *TooManyCookiesInOriginRequestPolicy) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyCookiesInOriginRequestPolicy) ErrorCode() string {
-	return "TooManyCookiesInOriginRequestPolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCookiesInOriginRequestPolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyCookiesInOriginRequestPolicy) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
 // The number of custom headers in the response headers policy exceeds the maximum.
-// For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+//
+// For more information, see [Quotas] (formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyCustomHeadersInResponseHeadersPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1734,7 +2831,10 @@ func (e *TooManyCustomHeadersInResponseHeadersPolicy) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyCustomHeadersInResponseHeadersPolicy) ErrorCode() string {
-	return "TooManyCustomHeadersInResponseHeadersPolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyCustomHeadersInResponseHeadersPolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyCustomHeadersInResponseHeadersPolicy) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -1743,6 +2843,8 @@ func (e *TooManyCustomHeadersInResponseHeadersPolicy) ErrorFault() smithy.ErrorF
 // Your request contains more CNAMEs than are allowed per distribution.
 type TooManyDistributionCNAMEs struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1756,13 +2858,20 @@ func (e *TooManyDistributionCNAMEs) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyDistributionCNAMEs) ErrorCode() string             { return "TooManyDistributionCNAMEs" }
+func (e *TooManyDistributionCNAMEs) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionCNAMEs"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyDistributionCNAMEs) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Processing your request would cause you to exceed the maximum number of
 // distributions allowed.
 type TooManyDistributions struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1776,15 +2885,23 @@ func (e *TooManyDistributions) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyDistributions) ErrorCode() string             { return "TooManyDistributions" }
+func (e *TooManyDistributions) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributions"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyDistributions) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The maximum number of distributions have been associated with the specified
-// cache policy. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// cache policy. For more information, see [Quotas](formerly known as limits) in the
+// Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyDistributionsAssociatedToCachePolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1799,7 +2916,10 @@ func (e *TooManyDistributionsAssociatedToCachePolicy) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyDistributionsAssociatedToCachePolicy) ErrorCode() string {
-	return "TooManyDistributionsAssociatedToCachePolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsAssociatedToCachePolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsAssociatedToCachePolicy) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -1809,6 +2929,8 @@ func (e *TooManyDistributionsAssociatedToCachePolicy) ErrorFault() smithy.ErrorF
 // configuration for field-level encryption.
 type TooManyDistributionsAssociatedToFieldLevelEncryptionConfig struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1823,18 +2945,24 @@ func (e *TooManyDistributionsAssociatedToFieldLevelEncryptionConfig) ErrorMessag
 	return *e.Message
 }
 func (e *TooManyDistributionsAssociatedToFieldLevelEncryptionConfig) ErrorCode() string {
-	return "TooManyDistributionsAssociatedToFieldLevelEncryptionConfig"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsAssociatedToFieldLevelEncryptionConfig"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsAssociatedToFieldLevelEncryptionConfig) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
 // The number of distributions that reference this key group is more than the
-// maximum allowed. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// maximum allowed. For more information, see [Quotas](formerly known as limits) in the
+// Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyDistributionsAssociatedToKeyGroup struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1849,18 +2977,58 @@ func (e *TooManyDistributionsAssociatedToKeyGroup) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyDistributionsAssociatedToKeyGroup) ErrorCode() string {
-	return "TooManyDistributionsAssociatedToKeyGroup"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsAssociatedToKeyGroup"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsAssociatedToKeyGroup) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
 // The maximum number of distributions have been associated with the specified
-// origin request policy. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// origin access control.
+//
+// For more information, see [Quotas] (formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
+type TooManyDistributionsAssociatedToOriginAccessControl struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *TooManyDistributionsAssociatedToOriginAccessControl) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *TooManyDistributionsAssociatedToOriginAccessControl) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *TooManyDistributionsAssociatedToOriginAccessControl) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsAssociatedToOriginAccessControl"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *TooManyDistributionsAssociatedToOriginAccessControl) ErrorFault() smithy.ErrorFault {
+	return smithy.FaultClient
+}
+
+// The maximum number of distributions have been associated with the specified
+// origin request policy. For more information, see [Quotas](formerly known as limits) in
+// the Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyDistributionsAssociatedToOriginRequestPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1875,18 +3043,26 @@ func (e *TooManyDistributionsAssociatedToOriginRequestPolicy) ErrorMessage() str
 	return *e.Message
 }
 func (e *TooManyDistributionsAssociatedToOriginRequestPolicy) ErrorCode() string {
-	return "TooManyDistributionsAssociatedToOriginRequestPolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsAssociatedToOriginRequestPolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsAssociatedToOriginRequestPolicy) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
 // The maximum number of distributions have been associated with the specified
-// response headers policy. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// response headers policy.
+//
+// For more information, see [Quotas] (formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyDistributionsAssociatedToResponseHeadersPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1901,18 +3077,24 @@ func (e *TooManyDistributionsAssociatedToResponseHeadersPolicy) ErrorMessage() s
 	return *e.Message
 }
 func (e *TooManyDistributionsAssociatedToResponseHeadersPolicy) ErrorCode() string {
-	return "TooManyDistributionsAssociatedToResponseHeadersPolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsAssociatedToResponseHeadersPolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsAssociatedToResponseHeadersPolicy) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
 // You have reached the maximum number of distributions that are associated with a
-// CloudFront function. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// CloudFront function. For more information, see [Quotas](formerly known as limits) in
+// the Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyDistributionsWithFunctionAssociations struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1927,7 +3109,10 @@ func (e *TooManyDistributionsWithFunctionAssociations) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyDistributionsWithFunctionAssociations) ErrorCode() string {
-	return "TooManyDistributionsWithFunctionAssociations"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsWithFunctionAssociations"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsWithFunctionAssociations) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -1937,6 +3122,8 @@ func (e *TooManyDistributionsWithFunctionAssociations) ErrorFault() smithy.Error
 // Lambda@Edge function associations per owner to be exceeded.
 type TooManyDistributionsWithLambdaAssociations struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1951,7 +3138,10 @@ func (e *TooManyDistributionsWithLambdaAssociations) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyDistributionsWithLambdaAssociations) ErrorCode() string {
-	return "TooManyDistributionsWithLambdaAssociations"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsWithLambdaAssociations"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsWithLambdaAssociations) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -1961,6 +3151,8 @@ func (e *TooManyDistributionsWithLambdaAssociations) ErrorFault() smithy.ErrorFa
 // Lambda@Edge function.
 type TooManyDistributionsWithSingleFunctionARN struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1975,7 +3167,10 @@ func (e *TooManyDistributionsWithSingleFunctionARN) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyDistributionsWithSingleFunctionARN) ErrorCode() string {
-	return "TooManyDistributionsWithSingleFunctionARN"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyDistributionsWithSingleFunctionARN"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyDistributionsWithSingleFunctionARN) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -1985,6 +3180,8 @@ func (e *TooManyDistributionsWithSingleFunctionARN) ErrorFault() smithy.ErrorFau
 // created.
 type TooManyFieldLevelEncryptionConfigs struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -1999,16 +3196,21 @@ func (e *TooManyFieldLevelEncryptionConfigs) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyFieldLevelEncryptionConfigs) ErrorCode() string {
-	return "TooManyFieldLevelEncryptionConfigs"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFieldLevelEncryptionConfigs"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyFieldLevelEncryptionConfigs) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
-// The maximum number of content type profiles for field-level encryption have been
-// created.
+// The maximum number of content type profiles for field-level encryption have
+// been created.
 type TooManyFieldLevelEncryptionContentTypeProfiles struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2023,7 +3225,10 @@ func (e *TooManyFieldLevelEncryptionContentTypeProfiles) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyFieldLevelEncryptionContentTypeProfiles) ErrorCode() string {
-	return "TooManyFieldLevelEncryptionContentTypeProfiles"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFieldLevelEncryptionContentTypeProfiles"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyFieldLevelEncryptionContentTypeProfiles) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -2033,6 +3238,8 @@ func (e *TooManyFieldLevelEncryptionContentTypeProfiles) ErrorFault() smithy.Err
 // created.
 type TooManyFieldLevelEncryptionEncryptionEntities struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2047,7 +3254,10 @@ func (e *TooManyFieldLevelEncryptionEncryptionEntities) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyFieldLevelEncryptionEncryptionEntities) ErrorCode() string {
-	return "TooManyFieldLevelEncryptionEncryptionEntities"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFieldLevelEncryptionEncryptionEntities"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyFieldLevelEncryptionEncryptionEntities) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -2057,6 +3267,8 @@ func (e *TooManyFieldLevelEncryptionEncryptionEntities) ErrorFault() smithy.Erro
 // created.
 type TooManyFieldLevelEncryptionFieldPatterns struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2071,7 +3283,10 @@ func (e *TooManyFieldLevelEncryptionFieldPatterns) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyFieldLevelEncryptionFieldPatterns) ErrorCode() string {
-	return "TooManyFieldLevelEncryptionFieldPatterns"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFieldLevelEncryptionFieldPatterns"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyFieldLevelEncryptionFieldPatterns) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -2080,6 +3295,8 @@ func (e *TooManyFieldLevelEncryptionFieldPatterns) ErrorFault() smithy.ErrorFaul
 // The maximum number of profiles for field-level encryption have been created.
 type TooManyFieldLevelEncryptionProfiles struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2094,7 +3311,10 @@ func (e *TooManyFieldLevelEncryptionProfiles) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyFieldLevelEncryptionProfiles) ErrorCode() string {
-	return "TooManyFieldLevelEncryptionProfiles"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFieldLevelEncryptionProfiles"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyFieldLevelEncryptionProfiles) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -2104,6 +3324,8 @@ func (e *TooManyFieldLevelEncryptionProfiles) ErrorFault() smithy.ErrorFault {
 // created.
 type TooManyFieldLevelEncryptionQueryArgProfiles struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2118,18 +3340,24 @@ func (e *TooManyFieldLevelEncryptionQueryArgProfiles) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyFieldLevelEncryptionQueryArgProfiles) ErrorCode() string {
-	return "TooManyFieldLevelEncryptionQueryArgProfiles"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFieldLevelEncryptionQueryArgProfiles"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyFieldLevelEncryptionQueryArgProfiles) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
-// You have reached the maximum number of CloudFront function associations for this
-// distribution. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// You have reached the maximum number of CloudFront function associations for
+// this distribution. For more information, see [Quotas](formerly known as limits) in the
+// Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyFunctionAssociations struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2143,15 +3371,23 @@ func (e *TooManyFunctionAssociations) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyFunctionAssociations) ErrorCode() string             { return "TooManyFunctionAssociations" }
+func (e *TooManyFunctionAssociations) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFunctionAssociations"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyFunctionAssociations) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You have reached the maximum number of CloudFront functions for this Amazon Web
-// Services account. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// Services account. For more information, see [Quotas](formerly known as limits) in the
+// Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyFunctions struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2165,15 +3401,23 @@ func (e *TooManyFunctions) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyFunctions) ErrorCode() string             { return "TooManyFunctions" }
+func (e *TooManyFunctions) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyFunctions"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyFunctions) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The number of headers in the cache policy exceeds the maximum. For more
-// information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// information, see [Quotas](formerly known as limits) in the Amazon CloudFront Developer
+// Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyHeadersInCachePolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2187,12 +3431,19 @@ func (e *TooManyHeadersInCachePolicy) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyHeadersInCachePolicy) ErrorCode() string             { return "TooManyHeadersInCachePolicy" }
+func (e *TooManyHeadersInCachePolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyHeadersInCachePolicy"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyHeadersInCachePolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Your request contains too many headers in forwarded values.
 type TooManyHeadersInForwardedValues struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2207,16 +3458,22 @@ func (e *TooManyHeadersInForwardedValues) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyHeadersInForwardedValues) ErrorCode() string {
-	return "TooManyHeadersInForwardedValues"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyHeadersInForwardedValues"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyHeadersInForwardedValues) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// The number of headers in the origin request policy exceeds the maximum. For more
-// information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// The number of headers in the origin request policy exceeds the maximum. For
+// more information, see [Quotas](formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyHeadersInOriginRequestPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2231,7 +3488,10 @@ func (e *TooManyHeadersInOriginRequestPolicy) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyHeadersInOriginRequestPolicy) ErrorCode() string {
-	return "TooManyHeadersInOriginRequestPolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyHeadersInOriginRequestPolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyHeadersInOriginRequestPolicy) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -2241,6 +3501,8 @@ func (e *TooManyHeadersInOriginRequestPolicy) ErrorFault() smithy.ErrorFault {
 // requests, or invalidation objects.
 type TooManyInvalidationsInProgress struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2254,15 +3516,23 @@ func (e *TooManyInvalidationsInProgress) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyInvalidationsInProgress) ErrorCode() string             { return "TooManyInvalidationsInProgress" }
+func (e *TooManyInvalidationsInProgress) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyInvalidationsInProgress"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyInvalidationsInProgress) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You have reached the maximum number of key groups for this Amazon Web Services
-// account. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// account. For more information, see [Quotas](formerly known as limits) in the Amazon
+// CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyKeyGroups struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2276,15 +3546,23 @@ func (e *TooManyKeyGroups) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyKeyGroups) ErrorCode() string             { return "TooManyKeyGroups" }
+func (e *TooManyKeyGroups) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyKeyGroups"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyKeyGroups) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The number of key groups referenced by this distribution is more than the
-// maximum allowed. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// maximum allowed. For more information, see [Quotas](formerly known as limits) in the
+// Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyKeyGroupsAssociatedToDistribution struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2299,7 +3577,10 @@ func (e *TooManyKeyGroupsAssociatedToDistribution) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyKeyGroupsAssociatedToDistribution) ErrorCode() string {
-	return "TooManyKeyGroupsAssociatedToDistribution"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyKeyGroupsAssociatedToDistribution"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyKeyGroupsAssociatedToDistribution) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -2309,6 +3590,8 @@ func (e *TooManyKeyGroupsAssociatedToDistribution) ErrorFault() smithy.ErrorFaul
 // per distribution.
 type TooManyLambdaFunctionAssociations struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2323,13 +3606,50 @@ func (e *TooManyLambdaFunctionAssociations) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyLambdaFunctionAssociations) ErrorCode() string {
-	return "TooManyLambdaFunctionAssociations"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyLambdaFunctionAssociations"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyLambdaFunctionAssociations) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
+
+// The number of origin access controls in your Amazon Web Services account
+// exceeds the maximum allowed.
+//
+// For more information, see [Quotas] (formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
+type TooManyOriginAccessControls struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *TooManyOriginAccessControls) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *TooManyOriginAccessControls) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *TooManyOriginAccessControls) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyOriginAccessControls"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *TooManyOriginAccessControls) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Your request contains too many origin custom headers.
 type TooManyOriginCustomHeaders struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2343,13 +3663,20 @@ func (e *TooManyOriginCustomHeaders) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyOriginCustomHeaders) ErrorCode() string             { return "TooManyOriginCustomHeaders" }
+func (e *TooManyOriginCustomHeaders) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyOriginCustomHeaders"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyOriginCustomHeaders) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Processing your request would cause you to exceed the maximum number of origin
 // groups allowed.
 type TooManyOriginGroupsPerDistribution struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2364,18 +3691,24 @@ func (e *TooManyOriginGroupsPerDistribution) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyOriginGroupsPerDistribution) ErrorCode() string {
-	return "TooManyOriginGroupsPerDistribution"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyOriginGroupsPerDistribution"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyOriginGroupsPerDistribution) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
 // You have reached the maximum number of origin request policies for this Amazon
-// Web Services account. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// Web Services account. For more information, see [Quotas](formerly known as limits) in
+// the Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyOriginRequestPolicies struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2389,12 +3722,19 @@ func (e *TooManyOriginRequestPolicies) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyOriginRequestPolicies) ErrorCode() string             { return "TooManyOriginRequestPolicies" }
+func (e *TooManyOriginRequestPolicies) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyOriginRequestPolicies"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyOriginRequestPolicies) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // You cannot create more origins for the distribution.
 type TooManyOrigins struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2408,13 +3748,20 @@ func (e *TooManyOrigins) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyOrigins) ErrorCode() string             { return "TooManyOrigins" }
+func (e *TooManyOrigins) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyOrigins"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyOrigins) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The maximum number of public keys for field-level encryption have been created.
 // To create a new public key, delete one of the existing keys.
 type TooManyPublicKeys struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2428,15 +3775,23 @@ func (e *TooManyPublicKeys) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyPublicKeys) ErrorCode() string             { return "TooManyPublicKeys" }
+func (e *TooManyPublicKeys) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyPublicKeys"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyPublicKeys) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The number of public keys in this key group is more than the maximum allowed.
-// For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// For more information, see [Quotas](formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyPublicKeysInKeyGroup struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2450,12 +3805,19 @@ func (e *TooManyPublicKeysInKeyGroup) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyPublicKeysInKeyGroup) ErrorCode() string             { return "TooManyPublicKeysInKeyGroup" }
+func (e *TooManyPublicKeysInKeyGroup) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyPublicKeysInKeyGroup"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyPublicKeysInKeyGroup) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Your request contains too many query string parameters.
 type TooManyQueryStringParameters struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2469,15 +3831,23 @@ func (e *TooManyQueryStringParameters) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyQueryStringParameters) ErrorCode() string             { return "TooManyQueryStringParameters" }
+func (e *TooManyQueryStringParameters) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyQueryStringParameters"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyQueryStringParameters) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The number of query strings in the cache policy exceeds the maximum. For more
-// information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// information, see [Quotas](formerly known as limits) in the Amazon CloudFront Developer
+// Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyQueryStringsInCachePolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2492,16 +3862,22 @@ func (e *TooManyQueryStringsInCachePolicy) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyQueryStringsInCachePolicy) ErrorCode() string {
-	return "TooManyQueryStringsInCachePolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyQueryStringsInCachePolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyQueryStringsInCachePolicy) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The number of query strings in the origin request policy exceeds the maximum.
-// For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// For more information, see [Quotas](formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyQueryStringsInOriginRequestPolicy struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2516,18 +3892,24 @@ func (e *TooManyQueryStringsInOriginRequestPolicy) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyQueryStringsInOriginRequestPolicy) ErrorCode() string {
-	return "TooManyQueryStringsInOriginRequestPolicy"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyQueryStringsInOriginRequestPolicy"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyQueryStringsInOriginRequestPolicy) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
 }
 
 // You have reached the maximum number of real-time log configurations for this
-// Amazon Web Services account. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// Amazon Web Services account. For more information, see [Quotas](formerly known as
+// limits) in the Amazon CloudFront Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyRealtimeLogConfigs struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2541,15 +3923,59 @@ func (e *TooManyRealtimeLogConfigs) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyRealtimeLogConfigs) ErrorCode() string             { return "TooManyRealtimeLogConfigs" }
+func (e *TooManyRealtimeLogConfigs) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyRealtimeLogConfigs"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyRealtimeLogConfigs) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
-// You have reached the maximum number of response headers policies for this Amazon
-// Web Services account. For more information, see Quotas
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html)
-// (formerly known as limits) in the Amazon CloudFront Developer Guide.
+// The number of headers in RemoveHeadersConfig in the response headers policy
+// exceeds the maximum.
+//
+// For more information, see [Quotas] (formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
+type TooManyRemoveHeadersInResponseHeadersPolicy struct {
+	Message *string
+
+	ErrorCodeOverride *string
+
+	noSmithyDocumentSerde
+}
+
+func (e *TooManyRemoveHeadersInResponseHeadersPolicy) Error() string {
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), e.ErrorMessage())
+}
+func (e *TooManyRemoveHeadersInResponseHeadersPolicy) ErrorMessage() string {
+	if e.Message == nil {
+		return ""
+	}
+	return *e.Message
+}
+func (e *TooManyRemoveHeadersInResponseHeadersPolicy) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyRemoveHeadersInResponseHeadersPolicy"
+	}
+	return *e.ErrorCodeOverride
+}
+func (e *TooManyRemoveHeadersInResponseHeadersPolicy) ErrorFault() smithy.ErrorFault {
+	return smithy.FaultClient
+}
+
+// You have reached the maximum number of response headers policies for this
+// Amazon Web Services account.
+//
+// For more information, see [Quotas] (formerly known as limits) in the Amazon CloudFront
+// Developer Guide.
+//
+// [Quotas]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
 type TooManyResponseHeadersPolicies struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2563,12 +3989,19 @@ func (e *TooManyResponseHeadersPolicies) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyResponseHeadersPolicies) ErrorCode() string             { return "TooManyResponseHeadersPolicies" }
+func (e *TooManyResponseHeadersPolicies) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyResponseHeadersPolicies"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyResponseHeadersPolicies) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Your request contains more CNAMEs than are allowed per distribution.
 type TooManyStreamingDistributionCNAMEs struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2583,7 +4016,10 @@ func (e *TooManyStreamingDistributionCNAMEs) ErrorMessage() string {
 	return *e.Message
 }
 func (e *TooManyStreamingDistributionCNAMEs) ErrorCode() string {
-	return "TooManyStreamingDistributionCNAMEs"
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyStreamingDistributionCNAMEs"
+	}
+	return *e.ErrorCodeOverride
 }
 func (e *TooManyStreamingDistributionCNAMEs) ErrorFault() smithy.ErrorFault {
 	return smithy.FaultClient
@@ -2593,6 +4029,8 @@ func (e *TooManyStreamingDistributionCNAMEs) ErrorFault() smithy.ErrorFault {
 // streaming distributions allowed.
 type TooManyStreamingDistributions struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2606,12 +4044,19 @@ func (e *TooManyStreamingDistributions) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyStreamingDistributions) ErrorCode() string             { return "TooManyStreamingDistributions" }
+func (e *TooManyStreamingDistributions) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyStreamingDistributions"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyStreamingDistributions) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // Your request contains more trusted signers than are allowed per distribution.
 type TooManyTrustedSigners struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2625,12 +4070,19 @@ func (e *TooManyTrustedSigners) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TooManyTrustedSigners) ErrorCode() string             { return "TooManyTrustedSigners" }
+func (e *TooManyTrustedSigners) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TooManyTrustedSigners"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TooManyTrustedSigners) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // The specified key group does not exist.
 type TrustedKeyGroupDoesNotExist struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2644,12 +4096,19 @@ func (e *TrustedKeyGroupDoesNotExist) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TrustedKeyGroupDoesNotExist) ErrorCode() string             { return "TrustedKeyGroupDoesNotExist" }
+func (e *TrustedKeyGroupDoesNotExist) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TrustedKeyGroupDoesNotExist"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TrustedKeyGroupDoesNotExist) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // One or more of your trusted signers don't exist.
 type TrustedSignerDoesNotExist struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2663,12 +4122,19 @@ func (e *TrustedSignerDoesNotExist) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *TrustedSignerDoesNotExist) ErrorCode() string             { return "TrustedSignerDoesNotExist" }
+func (e *TrustedSignerDoesNotExist) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "TrustedSignerDoesNotExist"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *TrustedSignerDoesNotExist) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }
 
 // This operation is not supported in this region.
 type UnsupportedOperation struct {
 	Message *string
+
+	ErrorCodeOverride *string
 
 	noSmithyDocumentSerde
 }
@@ -2682,5 +4148,10 @@ func (e *UnsupportedOperation) ErrorMessage() string {
 	}
 	return *e.Message
 }
-func (e *UnsupportedOperation) ErrorCode() string             { return "UnsupportedOperation" }
+func (e *UnsupportedOperation) ErrorCode() string {
+	if e == nil || e.ErrorCodeOverride == nil {
+		return "UnsupportedOperation"
+	}
+	return *e.ErrorCodeOverride
+}
 func (e *UnsupportedOperation) ErrorFault() smithy.ErrorFault { return smithy.FaultClient }

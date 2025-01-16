@@ -11,17 +11,19 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront"
 )
 
-// CloudFrontClientInterface is a mock cloudfront client.
-type CloudFrontClientInterface interface {
+// ClientInterface is a mock cloudfront client.
+type ClientInterface interface {
 	GetDistribution(ctx context.Context, params *cloudfront.GetDistributionInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetDistributionOutput, error)
 	GetInvalidation(ctx context.Context, params *cloudfront.GetInvalidationInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetInvalidationOutput, error)
 	ListDistributions(ctx context.Context, params *cloudfront.ListDistributionsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListDistributionsOutput, error)
 	ListInvalidations(ctx context.Context, params *cloudfront.ListInvalidationsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListInvalidationsOutput, error)
 }
 
-type MockCloudFrontClient struct{}
+// MockClient for testing.
+type MockClient struct{}
 
-func (c MockCloudFrontClient) GetDistribution(ctx context.Context, params *cloudfront.GetDistributionInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetDistributionOutput, error) {
+// GetDistribution mock function.
+func (c MockClient) GetDistribution(ctx context.Context, params *cloudfront.GetDistributionInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetDistributionOutput, error) {
 	return &cloudfront.GetDistributionOutput{
 		Distribution: &types.Distribution{
 			Id: aws.String("test-distribution-id"),
@@ -29,7 +31,8 @@ func (c MockCloudFrontClient) GetDistribution(ctx context.Context, params *cloud
 	}, nil
 }
 
-func (c MockCloudFrontClient) GetInvalidation(ctx context.Context, params *cloudfront.GetInvalidationInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetInvalidationOutput, error) {
+// GetInvalidation mock function.
+func (c MockClient) GetInvalidation(ctx context.Context, params *cloudfront.GetInvalidationInput, optFns ...func(*cloudfront.Options)) (*cloudfront.GetInvalidationOutput, error) {
 	return &cloudfront.GetInvalidationOutput{
 		Invalidation: &types.Invalidation{
 			CreateTime: aws.Time(time.Now()),
@@ -50,7 +53,8 @@ func (c MockCloudFrontClient) GetInvalidation(ctx context.Context, params *cloud
 	}, nil
 }
 
-func (c MockCloudFrontClient) ListDistributions(ctx context.Context, params *cloudfront.ListDistributionsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListDistributionsOutput, error) {
+// ListDistributions mock function.
+func (c MockClient) ListDistributions(ctx context.Context, params *cloudfront.ListDistributionsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListDistributionsOutput, error) {
 	return &cloudfront.ListDistributionsOutput{
 		DistributionList: &types.DistributionList{
 			Items: []types.DistributionSummary{
@@ -63,7 +67,8 @@ func (c MockCloudFrontClient) ListDistributions(ctx context.Context, params *clo
 	}, nil
 }
 
-func (c MockCloudFrontClient) ListInvalidations(ctx context.Context, params *cloudfront.ListInvalidationsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListInvalidationsOutput, error) {
+// ListInvalidations mock function.
+func (c MockClient) ListInvalidations(ctx context.Context, params *cloudfront.ListInvalidationsInput, optFns ...func(*cloudfront.Options)) (*cloudfront.ListInvalidationsOutput, error) {
 	return &cloudfront.ListInvalidationsOutput{
 		InvalidationList: &types.InvalidationList{
 			Items: []types.InvalidationSummary{

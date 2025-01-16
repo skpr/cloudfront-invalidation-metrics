@@ -13,8 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
-	cloudfrontclient "cloudfront-invalidation-metrics/internal/aws/cloudfront"
-	"cloudfront-invalidation-metrics/internal/metrics"
+	cloudfrontclient "github.com/skpr/cloudfront-invalidation-metrics/internal/aws/cloudfront"
+	"github.com/skpr/cloudfront-invalidation-metrics/internal/metrics"
 )
 
 const (
@@ -42,7 +42,7 @@ func Start(ctx context.Context) error {
 }
 
 // Execute will execute the given API calls against the input Clients.
-func Execute(ctx context.Context, clientCloudFront cloudfrontclient.CloudFrontClientInterface, client metrics.ClientInterface) error {
+func Execute(ctx context.Context, clientCloudFront cloudfrontclient.ClientInterface, client metrics.ClientInterface) error {
 	distributions, err := clientCloudFront.ListDistributions(ctx, &cloudfront.ListDistributionsInput{})
 	if err != nil {
 		return fmt.Errorf("failed to get CloudFront distibution list: %w", err)
