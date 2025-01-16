@@ -12,9 +12,11 @@ import (
 	"github.com/aws/smithy-go/encoding/httpbinding"
 	"github.com/aws/smithy-go/middleware"
 	smithytime "github.com/aws/smithy-go/time"
+	"github.com/aws/smithy-go/tracing"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 	"math"
 	"path"
+	"sort"
 )
 
 type awsAwsquery_serializeOpDeleteAlarms struct {
@@ -27,6 +29,10 @@ func (*awsAwsquery_serializeOpDeleteAlarms) ID() string {
 func (m *awsAwsquery_serializeOpDeleteAlarms) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -78,6 +84,8 @@ func (m *awsAwsquery_serializeOpDeleteAlarms) HandleSerialize(ctx context.Contex
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -91,6 +99,10 @@ func (*awsAwsquery_serializeOpDeleteAnomalyDetector) ID() string {
 func (m *awsAwsquery_serializeOpDeleteAnomalyDetector) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -142,6 +154,8 @@ func (m *awsAwsquery_serializeOpDeleteAnomalyDetector) HandleSerialize(ctx conte
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -155,6 +169,10 @@ func (*awsAwsquery_serializeOpDeleteDashboards) ID() string {
 func (m *awsAwsquery_serializeOpDeleteDashboards) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -206,6 +224,8 @@ func (m *awsAwsquery_serializeOpDeleteDashboards) HandleSerialize(ctx context.Co
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -219,6 +239,10 @@ func (*awsAwsquery_serializeOpDeleteInsightRules) ID() string {
 func (m *awsAwsquery_serializeOpDeleteInsightRules) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -270,6 +294,8 @@ func (m *awsAwsquery_serializeOpDeleteInsightRules) HandleSerialize(ctx context.
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -283,6 +309,10 @@ func (*awsAwsquery_serializeOpDeleteMetricStream) ID() string {
 func (m *awsAwsquery_serializeOpDeleteMetricStream) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -334,6 +364,8 @@ func (m *awsAwsquery_serializeOpDeleteMetricStream) HandleSerialize(ctx context.
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -347,6 +379,10 @@ func (*awsAwsquery_serializeOpDescribeAlarmHistory) ID() string {
 func (m *awsAwsquery_serializeOpDescribeAlarmHistory) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -398,6 +434,8 @@ func (m *awsAwsquery_serializeOpDescribeAlarmHistory) HandleSerialize(ctx contex
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -411,6 +449,10 @@ func (*awsAwsquery_serializeOpDescribeAlarms) ID() string {
 func (m *awsAwsquery_serializeOpDescribeAlarms) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -462,6 +504,8 @@ func (m *awsAwsquery_serializeOpDescribeAlarms) HandleSerialize(ctx context.Cont
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -475,6 +519,10 @@ func (*awsAwsquery_serializeOpDescribeAlarmsForMetric) ID() string {
 func (m *awsAwsquery_serializeOpDescribeAlarmsForMetric) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -526,6 +574,8 @@ func (m *awsAwsquery_serializeOpDescribeAlarmsForMetric) HandleSerialize(ctx con
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -539,6 +589,10 @@ func (*awsAwsquery_serializeOpDescribeAnomalyDetectors) ID() string {
 func (m *awsAwsquery_serializeOpDescribeAnomalyDetectors) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -590,6 +644,8 @@ func (m *awsAwsquery_serializeOpDescribeAnomalyDetectors) HandleSerialize(ctx co
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -603,6 +659,10 @@ func (*awsAwsquery_serializeOpDescribeInsightRules) ID() string {
 func (m *awsAwsquery_serializeOpDescribeInsightRules) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -654,6 +714,8 @@ func (m *awsAwsquery_serializeOpDescribeInsightRules) HandleSerialize(ctx contex
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -667,6 +729,10 @@ func (*awsAwsquery_serializeOpDisableAlarmActions) ID() string {
 func (m *awsAwsquery_serializeOpDisableAlarmActions) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -718,6 +784,8 @@ func (m *awsAwsquery_serializeOpDisableAlarmActions) HandleSerialize(ctx context
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -731,6 +799,10 @@ func (*awsAwsquery_serializeOpDisableInsightRules) ID() string {
 func (m *awsAwsquery_serializeOpDisableInsightRules) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -782,6 +854,8 @@ func (m *awsAwsquery_serializeOpDisableInsightRules) HandleSerialize(ctx context
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -795,6 +869,10 @@ func (*awsAwsquery_serializeOpEnableAlarmActions) ID() string {
 func (m *awsAwsquery_serializeOpEnableAlarmActions) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -846,6 +924,8 @@ func (m *awsAwsquery_serializeOpEnableAlarmActions) HandleSerialize(ctx context.
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -859,6 +939,10 @@ func (*awsAwsquery_serializeOpEnableInsightRules) ID() string {
 func (m *awsAwsquery_serializeOpEnableInsightRules) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -910,6 +994,8 @@ func (m *awsAwsquery_serializeOpEnableInsightRules) HandleSerialize(ctx context.
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -923,6 +1009,10 @@ func (*awsAwsquery_serializeOpGetDashboard) ID() string {
 func (m *awsAwsquery_serializeOpGetDashboard) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -974,6 +1064,8 @@ func (m *awsAwsquery_serializeOpGetDashboard) HandleSerialize(ctx context.Contex
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -987,6 +1079,10 @@ func (*awsAwsquery_serializeOpGetInsightRuleReport) ID() string {
 func (m *awsAwsquery_serializeOpGetInsightRuleReport) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1038,6 +1134,8 @@ func (m *awsAwsquery_serializeOpGetInsightRuleReport) HandleSerialize(ctx contex
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1051,6 +1149,10 @@ func (*awsAwsquery_serializeOpGetMetricData) ID() string {
 func (m *awsAwsquery_serializeOpGetMetricData) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1102,6 +1204,8 @@ func (m *awsAwsquery_serializeOpGetMetricData) HandleSerialize(ctx context.Conte
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1115,6 +1219,10 @@ func (*awsAwsquery_serializeOpGetMetricStatistics) ID() string {
 func (m *awsAwsquery_serializeOpGetMetricStatistics) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1166,6 +1274,8 @@ func (m *awsAwsquery_serializeOpGetMetricStatistics) HandleSerialize(ctx context
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1179,6 +1289,10 @@ func (*awsAwsquery_serializeOpGetMetricStream) ID() string {
 func (m *awsAwsquery_serializeOpGetMetricStream) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1230,6 +1344,8 @@ func (m *awsAwsquery_serializeOpGetMetricStream) HandleSerialize(ctx context.Con
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1243,6 +1359,10 @@ func (*awsAwsquery_serializeOpGetMetricWidgetImage) ID() string {
 func (m *awsAwsquery_serializeOpGetMetricWidgetImage) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1294,6 +1414,8 @@ func (m *awsAwsquery_serializeOpGetMetricWidgetImage) HandleSerialize(ctx contex
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1307,6 +1429,10 @@ func (*awsAwsquery_serializeOpListDashboards) ID() string {
 func (m *awsAwsquery_serializeOpListDashboards) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1358,6 +1484,78 @@ func (m *awsAwsquery_serializeOpListDashboards) HandleSerialize(ctx context.Cont
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
+	return next.HandleSerialize(ctx, in)
+}
+
+type awsAwsquery_serializeOpListManagedInsightRules struct {
+}
+
+func (*awsAwsquery_serializeOpListManagedInsightRules) ID() string {
+	return "OperationSerializer"
+}
+
+func (m *awsAwsquery_serializeOpListManagedInsightRules) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
+	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
+) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
+	request, ok := in.Request.(*smithyhttp.Request)
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
+	}
+
+	input, ok := in.Parameters.(*ListManagedInsightRulesInput)
+	_ = input
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown input parameters type %T", in.Parameters)}
+	}
+
+	operationPath := "/"
+	if len(request.Request.URL.Path) == 0 {
+		request.Request.URL.Path = operationPath
+	} else {
+		request.Request.URL.Path = path.Join(request.Request.URL.Path, operationPath)
+		if request.Request.URL.Path != "/" && operationPath[len(operationPath)-1] == '/' {
+			request.Request.URL.Path += "/"
+		}
+	}
+	request.Request.Method = "POST"
+	httpBindingEncoder, err := httpbinding.NewEncoder(request.URL.Path, request.URL.RawQuery, request.Header)
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	httpBindingEncoder.SetHeader("Content-Type").String("application/x-www-form-urlencoded")
+
+	bodyWriter := bytes.NewBuffer(nil)
+	bodyEncoder := query.NewEncoder(bodyWriter)
+	body := bodyEncoder.Object()
+	body.Key("Action").String("ListManagedInsightRules")
+	body.Key("Version").String("2010-08-01")
+
+	if err := awsAwsquery_serializeOpDocumentListManagedInsightRulesInput(input, bodyEncoder.Value); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	err = bodyEncoder.Encode()
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request, err = request.SetStream(bytes.NewReader(bodyWriter.Bytes())); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request.Request, err = httpBindingEncoder.Encode(request.Request); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	in.Request = request
+
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1371,6 +1569,10 @@ func (*awsAwsquery_serializeOpListMetrics) ID() string {
 func (m *awsAwsquery_serializeOpListMetrics) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1422,6 +1624,8 @@ func (m *awsAwsquery_serializeOpListMetrics) HandleSerialize(ctx context.Context
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1435,6 +1639,10 @@ func (*awsAwsquery_serializeOpListMetricStreams) ID() string {
 func (m *awsAwsquery_serializeOpListMetricStreams) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1486,6 +1694,8 @@ func (m *awsAwsquery_serializeOpListMetricStreams) HandleSerialize(ctx context.C
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1499,6 +1709,10 @@ func (*awsAwsquery_serializeOpListTagsForResource) ID() string {
 func (m *awsAwsquery_serializeOpListTagsForResource) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1550,6 +1764,8 @@ func (m *awsAwsquery_serializeOpListTagsForResource) HandleSerialize(ctx context
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1563,6 +1779,10 @@ func (*awsAwsquery_serializeOpPutAnomalyDetector) ID() string {
 func (m *awsAwsquery_serializeOpPutAnomalyDetector) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1614,6 +1834,8 @@ func (m *awsAwsquery_serializeOpPutAnomalyDetector) HandleSerialize(ctx context.
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1627,6 +1849,10 @@ func (*awsAwsquery_serializeOpPutCompositeAlarm) ID() string {
 func (m *awsAwsquery_serializeOpPutCompositeAlarm) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1678,6 +1904,8 @@ func (m *awsAwsquery_serializeOpPutCompositeAlarm) HandleSerialize(ctx context.C
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1691,6 +1919,10 @@ func (*awsAwsquery_serializeOpPutDashboard) ID() string {
 func (m *awsAwsquery_serializeOpPutDashboard) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1742,6 +1974,8 @@ func (m *awsAwsquery_serializeOpPutDashboard) HandleSerialize(ctx context.Contex
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1755,6 +1989,10 @@ func (*awsAwsquery_serializeOpPutInsightRule) ID() string {
 func (m *awsAwsquery_serializeOpPutInsightRule) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1806,6 +2044,78 @@ func (m *awsAwsquery_serializeOpPutInsightRule) HandleSerialize(ctx context.Cont
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
+	return next.HandleSerialize(ctx, in)
+}
+
+type awsAwsquery_serializeOpPutManagedInsightRules struct {
+}
+
+func (*awsAwsquery_serializeOpPutManagedInsightRules) ID() string {
+	return "OperationSerializer"
+}
+
+func (m *awsAwsquery_serializeOpPutManagedInsightRules) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
+	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
+) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
+	request, ok := in.Request.(*smithyhttp.Request)
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
+	}
+
+	input, ok := in.Parameters.(*PutManagedInsightRulesInput)
+	_ = input
+	if !ok {
+		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown input parameters type %T", in.Parameters)}
+	}
+
+	operationPath := "/"
+	if len(request.Request.URL.Path) == 0 {
+		request.Request.URL.Path = operationPath
+	} else {
+		request.Request.URL.Path = path.Join(request.Request.URL.Path, operationPath)
+		if request.Request.URL.Path != "/" && operationPath[len(operationPath)-1] == '/' {
+			request.Request.URL.Path += "/"
+		}
+	}
+	request.Request.Method = "POST"
+	httpBindingEncoder, err := httpbinding.NewEncoder(request.URL.Path, request.URL.RawQuery, request.Header)
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	httpBindingEncoder.SetHeader("Content-Type").String("application/x-www-form-urlencoded")
+
+	bodyWriter := bytes.NewBuffer(nil)
+	bodyEncoder := query.NewEncoder(bodyWriter)
+	body := bodyEncoder.Object()
+	body.Key("Action").String("PutManagedInsightRules")
+	body.Key("Version").String("2010-08-01")
+
+	if err := awsAwsquery_serializeOpDocumentPutManagedInsightRulesInput(input, bodyEncoder.Value); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	err = bodyEncoder.Encode()
+	if err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request, err = request.SetStream(bytes.NewReader(bodyWriter.Bytes())); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+
+	if request.Request, err = httpBindingEncoder.Encode(request.Request); err != nil {
+		return out, metadata, &smithy.SerializationError{Err: err}
+	}
+	in.Request = request
+
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1819,6 +2129,10 @@ func (*awsAwsquery_serializeOpPutMetricAlarm) ID() string {
 func (m *awsAwsquery_serializeOpPutMetricAlarm) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1870,6 +2184,8 @@ func (m *awsAwsquery_serializeOpPutMetricAlarm) HandleSerialize(ctx context.Cont
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1883,6 +2199,10 @@ func (*awsAwsquery_serializeOpPutMetricData) ID() string {
 func (m *awsAwsquery_serializeOpPutMetricData) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1934,6 +2254,8 @@ func (m *awsAwsquery_serializeOpPutMetricData) HandleSerialize(ctx context.Conte
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -1947,6 +2269,10 @@ func (*awsAwsquery_serializeOpPutMetricStream) ID() string {
 func (m *awsAwsquery_serializeOpPutMetricStream) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -1998,6 +2324,8 @@ func (m *awsAwsquery_serializeOpPutMetricStream) HandleSerialize(ctx context.Con
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -2011,6 +2339,10 @@ func (*awsAwsquery_serializeOpSetAlarmState) ID() string {
 func (m *awsAwsquery_serializeOpSetAlarmState) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -2062,6 +2394,8 @@ func (m *awsAwsquery_serializeOpSetAlarmState) HandleSerialize(ctx context.Conte
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -2075,6 +2409,10 @@ func (*awsAwsquery_serializeOpStartMetricStreams) ID() string {
 func (m *awsAwsquery_serializeOpStartMetricStreams) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -2126,6 +2464,8 @@ func (m *awsAwsquery_serializeOpStartMetricStreams) HandleSerialize(ctx context.
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -2139,6 +2479,10 @@ func (*awsAwsquery_serializeOpStopMetricStreams) ID() string {
 func (m *awsAwsquery_serializeOpStopMetricStreams) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -2190,6 +2534,8 @@ func (m *awsAwsquery_serializeOpStopMetricStreams) HandleSerialize(ctx context.C
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -2203,6 +2549,10 @@ func (*awsAwsquery_serializeOpTagResource) ID() string {
 func (m *awsAwsquery_serializeOpTagResource) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -2254,6 +2604,8 @@ func (m *awsAwsquery_serializeOpTagResource) HandleSerialize(ctx context.Context
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 
@@ -2267,6 +2619,10 @@ func (*awsAwsquery_serializeOpUntagResource) ID() string {
 func (m *awsAwsquery_serializeOpUntagResource) HandleSerialize(ctx context.Context, in middleware.SerializeInput, next middleware.SerializeHandler) (
 	out middleware.SerializeOutput, metadata middleware.Metadata, err error,
 ) {
+	_, span := tracing.StartSpan(ctx, "OperationSerializer")
+	endTimer := startMetricTimer(ctx, "client.call.serialization_duration")
+	defer endTimer()
+	defer span.End()
 	request, ok := in.Request.(*smithyhttp.Request)
 	if !ok {
 		return out, metadata, &smithy.SerializationError{Err: fmt.Errorf("unknown transport type %T", in.Request)}
@@ -2318,12 +2674,11 @@ func (m *awsAwsquery_serializeOpUntagResource) HandleSerialize(ctx context.Conte
 	}
 	in.Request = request
 
+	endTimer()
+	span.End()
 	return next.HandleSerialize(ctx, in)
 }
 func awsAwsquery_serializeDocumentAlarmNames(v []string, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2334,9 +2689,6 @@ func awsAwsquery_serializeDocumentAlarmNames(v []string, value query.Value) erro
 }
 
 func awsAwsquery_serializeDocumentAlarmTypes(v []types.AlarmType, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2366,9 +2718,6 @@ func awsAwsquery_serializeDocumentAnomalyDetectorConfiguration(v *types.AnomalyD
 }
 
 func awsAwsquery_serializeDocumentAnomalyDetectorExcludedTimeRanges(v []types.Range, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2381,9 +2730,6 @@ func awsAwsquery_serializeDocumentAnomalyDetectorExcludedTimeRanges(v []types.Ra
 }
 
 func awsAwsquery_serializeDocumentAnomalyDetectorTypes(v []types.AnomalyDetectorType, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2394,9 +2740,6 @@ func awsAwsquery_serializeDocumentAnomalyDetectorTypes(v []types.AnomalyDetector
 }
 
 func awsAwsquery_serializeDocumentCounts(v []float64, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2420,9 +2763,6 @@ func awsAwsquery_serializeDocumentCounts(v []float64, value query.Value) error {
 }
 
 func awsAwsquery_serializeDocumentDashboardNames(v []string, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2467,9 +2807,6 @@ func awsAwsquery_serializeDocumentDimensionFilter(v *types.DimensionFilter, valu
 }
 
 func awsAwsquery_serializeDocumentDimensionFilters(v []types.DimensionFilter, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2482,9 +2819,6 @@ func awsAwsquery_serializeDocumentDimensionFilters(v []types.DimensionFilter, va
 }
 
 func awsAwsquery_serializeDocumentDimensions(v []types.Dimension, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2496,10 +2830,99 @@ func awsAwsquery_serializeDocumentDimensions(v []types.Dimension, value query.Va
 	return nil
 }
 
-func awsAwsquery_serializeDocumentExtendedStatistics(v []string, value query.Value) error {
+func awsAwsquery_serializeDocumentEntity(v *types.Entity, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.Attributes != nil {
+		objectKey := object.Key("Attributes")
+		if err := awsAwsquery_serializeDocumentEntityAttributesMap(v.Attributes, objectKey); err != nil {
+			return err
+		}
+	}
+
+	if v.KeyAttributes != nil {
+		objectKey := object.Key("KeyAttributes")
+		if err := awsAwsquery_serializeDocumentEntityKeyAttributesMap(v.KeyAttributes, objectKey); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func awsAwsquery_serializeDocumentEntityAttributesMap(v map[string]string, value query.Value) error {
 	if len(v) == 0 {
 		return nil
 	}
+	object := value.Map("key", "value")
+
+	keys := make([]string, 0, len(v))
+	for key := range v {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		om := object.Key(key)
+		om.String(v[key])
+	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentEntityKeyAttributesMap(v map[string]string, value query.Value) error {
+	if len(v) == 0 {
+		return nil
+	}
+	object := value.Map("key", "value")
+
+	keys := make([]string, 0, len(v))
+	for key := range v {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		om := object.Key(key)
+		om.String(v[key])
+	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentEntityMetricData(v *types.EntityMetricData, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.Entity != nil {
+		objectKey := object.Key("Entity")
+		if err := awsAwsquery_serializeDocumentEntity(v.Entity, objectKey); err != nil {
+			return err
+		}
+	}
+
+	if v.MetricData != nil {
+		objectKey := object.Key("MetricData")
+		if err := awsAwsquery_serializeDocumentMetricData(v.MetricData, objectKey); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func awsAwsquery_serializeDocumentEntityMetricDataList(v []types.EntityMetricData, value query.Value) error {
+	array := value.Array("member")
+
+	for i := range v {
+		av := array.Value()
+		if err := awsAwsquery_serializeDocumentEntityMetricData(&v[i], av); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentExtendedStatistics(v []string, value query.Value) error {
 	array := value.Array("member")
 
 	for i := range v {
@@ -2510,9 +2933,6 @@ func awsAwsquery_serializeDocumentExtendedStatistics(v []string, value query.Val
 }
 
 func awsAwsquery_serializeDocumentInsightRuleMetricList(v []string, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2523,9 +2943,6 @@ func awsAwsquery_serializeDocumentInsightRuleMetricList(v []string, value query.
 }
 
 func awsAwsquery_serializeDocumentInsightRuleNames(v []string, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2544,6 +2961,42 @@ func awsAwsquery_serializeDocumentLabelOptions(v *types.LabelOptions, value quer
 		objectKey.String(*v.Timezone)
 	}
 
+	return nil
+}
+
+func awsAwsquery_serializeDocumentManagedRule(v *types.ManagedRule, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.ResourceARN != nil {
+		objectKey := object.Key("ResourceARN")
+		objectKey.String(*v.ResourceARN)
+	}
+
+	if v.Tags != nil {
+		objectKey := object.Key("Tags")
+		if err := awsAwsquery_serializeDocumentTagList(v.Tags, objectKey); err != nil {
+			return err
+		}
+	}
+
+	if v.TemplateName != nil {
+		objectKey := object.Key("TemplateName")
+		objectKey.String(*v.TemplateName)
+	}
+
+	return nil
+}
+
+func awsAwsquery_serializeDocumentManagedRules(v []types.ManagedRule, value query.Value) error {
+	array := value.Array("member")
+
+	for i := range v {
+		av := array.Value()
+		if err := awsAwsquery_serializeDocumentManagedRule(&v[i], av); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -2571,10 +3024,19 @@ func awsAwsquery_serializeDocumentMetric(v *types.Metric, value query.Value) err
 	return nil
 }
 
-func awsAwsquery_serializeDocumentMetricData(v []types.MetricDatum, value query.Value) error {
-	if len(v) == 0 {
-		return nil
+func awsAwsquery_serializeDocumentMetricCharacteristics(v *types.MetricCharacteristics, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.PeriodicSpikes != nil {
+		objectKey := object.Key("PeriodicSpikes")
+		objectKey.Boolean(*v.PeriodicSpikes)
 	}
+
+	return nil
+}
+
+func awsAwsquery_serializeDocumentMetricData(v []types.MetricDatum, value query.Value) error {
 	array := value.Array("member")
 
 	for i := range v {
@@ -2587,9 +3049,6 @@ func awsAwsquery_serializeDocumentMetricData(v []types.MetricDatum, value query.
 }
 
 func awsAwsquery_serializeDocumentMetricDataQueries(v []types.MetricDataQuery, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2765,6 +3224,13 @@ func awsAwsquery_serializeDocumentMetricStreamFilter(v *types.MetricStreamFilter
 	object := value.Object()
 	_ = object
 
+	if v.MetricNames != nil {
+		objectKey := object.Key("MetricNames")
+		if err := awsAwsquery_serializeDocumentMetricStreamFilterMetricNames(v.MetricNames, objectKey); err != nil {
+			return err
+		}
+	}
+
 	if v.Namespace != nil {
 		objectKey := object.Key("Namespace")
 		objectKey.String(*v.Namespace)
@@ -2773,10 +3239,17 @@ func awsAwsquery_serializeDocumentMetricStreamFilter(v *types.MetricStreamFilter
 	return nil
 }
 
-func awsAwsquery_serializeDocumentMetricStreamFilters(v []types.MetricStreamFilter, value query.Value) error {
-	if len(v) == 0 {
-		return nil
+func awsAwsquery_serializeDocumentMetricStreamFilterMetricNames(v []string, value query.Value) error {
+	array := value.Array("member")
+
+	for i := range v {
+		av := array.Value()
+		av.String(v[i])
 	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentMetricStreamFilters(v []types.MetricStreamFilter, value query.Value) error {
 	array := value.Array("member")
 
 	for i := range v {
@@ -2789,15 +3262,84 @@ func awsAwsquery_serializeDocumentMetricStreamFilters(v []types.MetricStreamFilt
 }
 
 func awsAwsquery_serializeDocumentMetricStreamNames(v []string, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
 		av := array.Value()
 		av.String(v[i])
 	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentMetricStreamStatisticsAdditionalStatistics(v []string, value query.Value) error {
+	array := value.Array("member")
+
+	for i := range v {
+		av := array.Value()
+		av.String(v[i])
+	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentMetricStreamStatisticsConfiguration(v *types.MetricStreamStatisticsConfiguration, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.AdditionalStatistics != nil {
+		objectKey := object.Key("AdditionalStatistics")
+		if err := awsAwsquery_serializeDocumentMetricStreamStatisticsAdditionalStatistics(v.AdditionalStatistics, objectKey); err != nil {
+			return err
+		}
+	}
+
+	if v.IncludeMetrics != nil {
+		objectKey := object.Key("IncludeMetrics")
+		if err := awsAwsquery_serializeDocumentMetricStreamStatisticsIncludeMetrics(v.IncludeMetrics, objectKey); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func awsAwsquery_serializeDocumentMetricStreamStatisticsConfigurations(v []types.MetricStreamStatisticsConfiguration, value query.Value) error {
+	array := value.Array("member")
+
+	for i := range v {
+		av := array.Value()
+		if err := awsAwsquery_serializeDocumentMetricStreamStatisticsConfiguration(&v[i], av); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentMetricStreamStatisticsIncludeMetrics(v []types.MetricStreamStatisticsMetric, value query.Value) error {
+	array := value.Array("member")
+
+	for i := range v {
+		av := array.Value()
+		if err := awsAwsquery_serializeDocumentMetricStreamStatisticsMetric(&v[i], av); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func awsAwsquery_serializeDocumentMetricStreamStatisticsMetric(v *types.MetricStreamStatisticsMetric, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.MetricName != nil {
+		objectKey := object.Key("MetricName")
+		objectKey.String(*v.MetricName)
+	}
+
+	if v.Namespace != nil {
+		objectKey := object.Key("Namespace")
+		objectKey.String(*v.Namespace)
+	}
+
 	return nil
 }
 
@@ -2819,9 +3361,6 @@ func awsAwsquery_serializeDocumentRange(v *types.Range, value query.Value) error
 }
 
 func awsAwsquery_serializeDocumentResourceList(v []string, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2834,6 +3373,11 @@ func awsAwsquery_serializeDocumentResourceList(v []string, value query.Value) er
 func awsAwsquery_serializeDocumentSingleMetricAnomalyDetector(v *types.SingleMetricAnomalyDetector, value query.Value) error {
 	object := value.Object()
 	_ = object
+
+	if v.AccountId != nil {
+		objectKey := object.Key("AccountId")
+		objectKey.String(*v.AccountId)
+	}
 
 	if v.Dimensions != nil {
 		objectKey := object.Key("Dimensions")
@@ -2861,9 +3405,6 @@ func awsAwsquery_serializeDocumentSingleMetricAnomalyDetector(v *types.SingleMet
 }
 
 func awsAwsquery_serializeDocumentStatistics(v []types.Statistic, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2970,9 +3511,6 @@ func awsAwsquery_serializeDocumentTag(v *types.Tag, value query.Value) error {
 }
 
 func awsAwsquery_serializeDocumentTagKeyList(v []string, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2983,9 +3521,6 @@ func awsAwsquery_serializeDocumentTagKeyList(v []string, value query.Value) erro
 }
 
 func awsAwsquery_serializeDocumentTagList(v []types.Tag, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -2998,9 +3533,6 @@ func awsAwsquery_serializeDocumentTagList(v []types.Tag, value query.Value) erro
 }
 
 func awsAwsquery_serializeDocumentValues(v []float64, value query.Value) error {
-	if len(v) == 0 {
-		return nil
-	}
 	array := value.Array("member")
 
 	for i := range v {
@@ -3589,6 +4121,28 @@ func awsAwsquery_serializeOpDocumentListDashboardsInput(v *ListDashboardsInput, 
 	return nil
 }
 
+func awsAwsquery_serializeOpDocumentListManagedInsightRulesInput(v *ListManagedInsightRulesInput, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.MaxResults != nil {
+		objectKey := object.Key("MaxResults")
+		objectKey.Integer(*v.MaxResults)
+	}
+
+	if v.NextToken != nil {
+		objectKey := object.Key("NextToken")
+		objectKey.String(*v.NextToken)
+	}
+
+	if v.ResourceARN != nil {
+		objectKey := object.Key("ResourceARN")
+		objectKey.String(*v.ResourceARN)
+	}
+
+	return nil
+}
+
 func awsAwsquery_serializeOpDocumentListMetricsInput(v *ListMetricsInput, value query.Value) error {
 	object := value.Object()
 	_ = object
@@ -3598,6 +4152,11 @@ func awsAwsquery_serializeOpDocumentListMetricsInput(v *ListMetricsInput, value 
 		if err := awsAwsquery_serializeDocumentDimensionFilters(v.Dimensions, objectKey); err != nil {
 			return err
 		}
+	}
+
+	if v.IncludeLinkedAccounts != nil {
+		objectKey := object.Key("IncludeLinkedAccounts")
+		objectKey.Boolean(*v.IncludeLinkedAccounts)
 	}
 
 	if v.MetricName != nil {
@@ -3613,6 +4172,11 @@ func awsAwsquery_serializeOpDocumentListMetricsInput(v *ListMetricsInput, value 
 	if v.NextToken != nil {
 		objectKey := object.Key("NextToken")
 		objectKey.String(*v.NextToken)
+	}
+
+	if v.OwningAccount != nil {
+		objectKey := object.Key("OwningAccount")
+		objectKey.String(*v.OwningAccount)
 	}
 
 	if len(v.RecentlyActive) > 0 {
@@ -3670,6 +4234,13 @@ func awsAwsquery_serializeOpDocumentPutAnomalyDetectorInput(v *PutAnomalyDetecto
 		}
 	}
 
+	if v.MetricCharacteristics != nil {
+		objectKey := object.Key("MetricCharacteristics")
+		if err := awsAwsquery_serializeDocumentMetricCharacteristics(v.MetricCharacteristics, objectKey); err != nil {
+			return err
+		}
+	}
+
 	if v.MetricMathAnomalyDetector != nil {
 		objectKey := object.Key("MetricMathAnomalyDetector")
 		if err := awsAwsquery_serializeDocumentMetricMathAnomalyDetector(v.MetricMathAnomalyDetector, objectKey); err != nil {
@@ -3709,6 +4280,21 @@ func awsAwsquery_serializeOpDocumentPutCompositeAlarmInput(v *PutCompositeAlarmI
 	if v.ActionsEnabled != nil {
 		objectKey := object.Key("ActionsEnabled")
 		objectKey.Boolean(*v.ActionsEnabled)
+	}
+
+	if v.ActionsSuppressor != nil {
+		objectKey := object.Key("ActionsSuppressor")
+		objectKey.String(*v.ActionsSuppressor)
+	}
+
+	if v.ActionsSuppressorExtensionPeriod != nil {
+		objectKey := object.Key("ActionsSuppressorExtensionPeriod")
+		objectKey.Integer(*v.ActionsSuppressorExtensionPeriod)
+	}
+
+	if v.ActionsSuppressorWaitPeriod != nil {
+		objectKey := object.Key("ActionsSuppressorWaitPeriod")
+		objectKey.Integer(*v.ActionsSuppressorWaitPeriod)
 	}
 
 	if v.AlarmActions != nil {
@@ -3796,6 +4382,20 @@ func awsAwsquery_serializeOpDocumentPutInsightRuleInput(v *PutInsightRuleInput, 
 	if v.Tags != nil {
 		objectKey := object.Key("Tags")
 		if err := awsAwsquery_serializeDocumentTagList(v.Tags, objectKey); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func awsAwsquery_serializeOpDocumentPutManagedInsightRulesInput(v *PutManagedInsightRulesInput, value query.Value) error {
+	object := value.Object()
+	_ = object
+
+	if v.ManagedRules != nil {
+		objectKey := object.Key("ManagedRules")
+		if err := awsAwsquery_serializeDocumentManagedRules(v.ManagedRules, objectKey); err != nil {
 			return err
 		}
 	}
@@ -3949,6 +4549,13 @@ func awsAwsquery_serializeOpDocumentPutMetricDataInput(v *PutMetricDataInput, va
 	object := value.Object()
 	_ = object
 
+	if v.EntityMetricData != nil {
+		objectKey := object.Key("EntityMetricData")
+		if err := awsAwsquery_serializeDocumentEntityMetricDataList(v.EntityMetricData, objectKey); err != nil {
+			return err
+		}
+	}
+
 	if v.MetricData != nil {
 		objectKey := object.Key("MetricData")
 		if err := awsAwsquery_serializeDocumentMetricData(v.MetricData, objectKey); err != nil {
@@ -3959,6 +4566,11 @@ func awsAwsquery_serializeOpDocumentPutMetricDataInput(v *PutMetricDataInput, va
 	if v.Namespace != nil {
 		objectKey := object.Key("Namespace")
 		objectKey.String(*v.Namespace)
+	}
+
+	if v.StrictEntityValidation != nil {
+		objectKey := object.Key("StrictEntityValidation")
+		objectKey.Boolean(*v.StrictEntityValidation)
 	}
 
 	return nil
@@ -3987,6 +4599,11 @@ func awsAwsquery_serializeOpDocumentPutMetricStreamInput(v *PutMetricStreamInput
 		}
 	}
 
+	if v.IncludeLinkedAccountsMetrics != nil {
+		objectKey := object.Key("IncludeLinkedAccountsMetrics")
+		objectKey.Boolean(*v.IncludeLinkedAccountsMetrics)
+	}
+
 	if v.Name != nil {
 		objectKey := object.Key("Name")
 		objectKey.String(*v.Name)
@@ -4000,6 +4617,13 @@ func awsAwsquery_serializeOpDocumentPutMetricStreamInput(v *PutMetricStreamInput
 	if v.RoleArn != nil {
 		objectKey := object.Key("RoleArn")
 		objectKey.String(*v.RoleArn)
+	}
+
+	if v.StatisticsConfigurations != nil {
+		objectKey := object.Key("StatisticsConfigurations")
+		if err := awsAwsquery_serializeDocumentMetricStreamStatisticsConfigurations(v.StatisticsConfigurations, objectKey); err != nil {
+			return err
+		}
 	}
 
 	if v.Tags != nil {

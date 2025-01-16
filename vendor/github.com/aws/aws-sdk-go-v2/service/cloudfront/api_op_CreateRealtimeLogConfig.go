@@ -4,19 +4,23 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Creates a real-time log configuration. After you create a real-time log
-// configuration, you can attach it to one or more cache behaviors to send
-// real-time log data to the specified Amazon Kinesis data stream. For more
-// information about real-time log configurations, see Real-time logs
-// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html)
-// in the Amazon CloudFront Developer Guide.
+// Creates a real-time log configuration.
+//
+// After you create a real-time log configuration, you can attach it to one or
+// more cache behaviors to send real-time log data to the specified Amazon Kinesis
+// data stream.
+//
+// For more information about real-time log configurations, see [Real-time logs] in the Amazon
+// CloudFront Developer Guide.
+//
+// [Real-time logs]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html
 func (c *Client) CreateRealtimeLogConfig(ctx context.Context, params *CreateRealtimeLogConfigInput, optFns ...func(*Options)) (*CreateRealtimeLogConfigOutput, error) {
 	if params == nil {
 		params = &CreateRealtimeLogConfigInput{}
@@ -40,10 +44,12 @@ type CreateRealtimeLogConfigInput struct {
 	// This member is required.
 	EndPoints []types.EndPoint
 
-	// A list of fields to include in each real-time log record. For more information
-	// about fields, see Real-time log configuration fields
-	// (https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields)
-	// in the Amazon CloudFront Developer Guide.
+	// A list of fields to include in each real-time log record.
+	//
+	// For more information about fields, see [Real-time log configuration fields] in the Amazon CloudFront Developer
+	// Guide.
+	//
+	// [Real-time log configuration fields]: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields
 	//
 	// This member is required.
 	Fields []string
@@ -53,9 +59,9 @@ type CreateRealtimeLogConfigInput struct {
 	// This member is required.
 	Name *string
 
-	// The sampling rate for this real-time log configuration. The sampling rate
-	// determines the percentage of viewer requests that are represented in the
-	// real-time log data. You must provide an integer between 1 and 100, inclusive.
+	// The sampling rate for this real-time log configuration. You can specify a whole
+	// number between 1 and 100 (inclusive) to determine the percentage of viewer
+	// requests that are represented in the real-time log data.
 	//
 	// This member is required.
 	SamplingRate *int64
@@ -75,6 +81,9 @@ type CreateRealtimeLogConfigOutput struct {
 }
 
 func (c *Client) addOperationCreateRealtimeLogConfigMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpCreateRealtimeLogConfig{}, middleware.After)
 	if err != nil {
 		return err
@@ -83,34 +92,41 @@ func (c *Client) addOperationCreateRealtimeLogConfigMiddlewares(stack *middlewar
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "CreateRealtimeLogConfig"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -119,10 +135,22 @@ func (c *Client) addOperationCreateRealtimeLogConfigMiddlewares(stack *middlewar
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpCreateRealtimeLogConfigValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opCreateRealtimeLogConfig(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -134,6 +162,21 @@ func (c *Client) addOperationCreateRealtimeLogConfigMiddlewares(stack *middlewar
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -141,7 +184,6 @@ func newServiceMetadataMiddleware_opCreateRealtimeLogConfig(region string) *awsm
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "CreateRealtimeLogConfig",
 	}
 }

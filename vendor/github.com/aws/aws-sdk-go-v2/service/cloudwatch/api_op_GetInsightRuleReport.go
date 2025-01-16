@@ -4,8 +4,8 @@ package cloudwatch
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
@@ -14,36 +14,35 @@ import (
 
 // This operation returns the time series data collected by a Contributor Insights
 // rule. The data includes the identity and number of contributors to the log
-// group. You can also optionally return one or more statistics about each data
-// point in the time series. These statistics can include the following:
+// group.
 //
-// *
-// UniqueContributors -- the number of unique contributors for each data point.
+// You can also optionally return one or more statistics about each data point in
+// the time series. These statistics can include the following:
 //
-// *
-// MaxContributorValue -- the value of the top contributor for each data point. The
-// identity of the contributor might change for each data point in the graph. If
-// this rule aggregates by COUNT, the top contributor for each data point is the
-// contributor with the most occurrences in that period. If the rule aggregates by
-// SUM, the top contributor is the contributor with the highest sum in the log
-// field specified by the rule's Value, during that period.
+//   - UniqueContributors -- the number of unique contributors for each data point.
 //
-// * SampleCount -- the
-// number of data points matched by the rule.
+//   - MaxContributorValue -- the value of the top contributor for each data point.
+//     The identity of the contributor might change for each data point in the graph.
 //
-// * Sum -- the sum of the values from
-// all contributors during the time period represented by that data point.
+// If this rule aggregates by COUNT, the top contributor for each data point is
 //
-// *
-// Minimum -- the minimum value from a single observation during the time period
-// represented by that data point.
+//	the contributor with the most occurrences in that period. If the rule aggregates
+//	by SUM, the top contributor is the contributor with the highest sum in the log
+//	field specified by the rule's Value , during that period.
 //
-// * Maximum -- the maximum value from a single
-// observation during the time period represented by that data point.
+//	- SampleCount -- the number of data points matched by the rule.
 //
-// * Average --
-// the average value from all contributors during the time period represented by
-// that data point.
+//	- Sum -- the sum of the values from all contributors during the time period
+//	represented by that data point.
+//
+//	- Minimum -- the minimum value from a single observation during the time
+//	period represented by that data point.
+//
+//	- Maximum -- the maximum value from a single observation during the time
+//	period represented by that data point.
+//
+//	- Average -- the average value from all contributors during the time period
+//	represented by that data point.
 func (c *Client) GetInsightRuleReport(ctx context.Context, params *GetInsightRuleReportInput, optFns ...func(*Options)) (*GetInsightRuleReportOutput, error) {
 	if params == nil {
 		params = &GetInsightRuleReportInput{}
@@ -62,7 +61,8 @@ func (c *Client) GetInsightRuleReport(ctx context.Context, params *GetInsightRul
 type GetInsightRuleReportInput struct {
 
 	// The end time of the data to use in the report. When used in a raw HTTP Query
-	// API, it is formatted as yyyy-MM-dd'T'HH:mm:ss. For example, 2019-07-01T23:59:59.
+	// API, it is formatted as yyyy-MM-dd'T'HH:mm:ss . For example, 2019-07-01T23:59:59
+	// .
 	//
 	// This member is required.
 	EndTime *time.Time
@@ -79,7 +79,8 @@ type GetInsightRuleReportInput struct {
 	RuleName *string
 
 	// The start time of the data to use in the report. When used in a raw HTTP Query
-	// API, it is formatted as yyyy-MM-dd'T'HH:mm:ss. For example, 2019-07-01T23:59:59.
+	// API, it is formatted as yyyy-MM-dd'T'HH:mm:ss . For example, 2019-07-01T23:59:59
+	// .
 	//
 	// This member is required.
 	StartTime *time.Time
@@ -91,37 +92,33 @@ type GetInsightRuleReportInput struct {
 	// Specifies which metrics to use for aggregation of contributor values for the
 	// report. You can specify one or more of the following metrics:
 	//
-	// *
-	// UniqueContributors -- the number of unique contributors for each data point.
+	//   - UniqueContributors -- the number of unique contributors for each data point.
 	//
-	// *
-	// MaxContributorValue -- the value of the top contributor for each data point. The
-	// identity of the contributor might change for each data point in the graph. If
-	// this rule aggregates by COUNT, the top contributor for each data point is the
-	// contributor with the most occurrences in that period. If the rule aggregates by
-	// SUM, the top contributor is the contributor with the highest sum in the log
-	// field specified by the rule's Value, during that period.
+	//   - MaxContributorValue -- the value of the top contributor for each data point.
+	//   The identity of the contributor might change for each data point in the graph.
 	//
-	// * SampleCount -- the
-	// number of data points matched by the rule.
+	// If this rule aggregates by COUNT, the top contributor for each data point is
+	//   the contributor with the most occurrences in that period. If the rule aggregates
+	//   by SUM, the top contributor is the contributor with the highest sum in the log
+	//   field specified by the rule's Value , during that period.
 	//
-	// * Sum -- the sum of the values from
-	// all contributors during the time period represented by that data point.
+	//   - SampleCount -- the number of data points matched by the rule.
 	//
-	// *
-	// Minimum -- the minimum value from a single observation during the time period
-	// represented by that data point.
+	//   - Sum -- the sum of the values from all contributors during the time period
+	//   represented by that data point.
 	//
-	// * Maximum -- the maximum value from a single
-	// observation during the time period represented by that data point.
+	//   - Minimum -- the minimum value from a single observation during the time
+	//   period represented by that data point.
 	//
-	// * Average --
-	// the average value from all contributors during the time period represented by
-	// that data point.
+	//   - Maximum -- the maximum value from a single observation during the time
+	//   period represented by that data point.
+	//
+	//   - Average -- the average value from all contributors during the time period
+	//   represented by that data point.
 	Metrics []string
 
-	// Determines what statistic to use to rank the contributors. Valid values are SUM
-	// and MAXIMUM.
+	// Determines what statistic to use to rank the contributors. Valid values are Sum
+	// and Maximum .
 	OrderBy *string
 
 	noSmithyDocumentSerde
@@ -161,6 +158,9 @@ type GetInsightRuleReportOutput struct {
 }
 
 func (c *Client) addOperationGetInsightRuleReportMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsAwsquery_serializeOpGetInsightRuleReport{}, middleware.After)
 	if err != nil {
 		return err
@@ -169,34 +169,41 @@ func (c *Client) addOperationGetInsightRuleReportMiddlewares(stack *middleware.S
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "GetInsightRuleReport"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -205,10 +212,22 @@ func (c *Client) addOperationGetInsightRuleReportMiddlewares(stack *middleware.S
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpGetInsightRuleReportValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opGetInsightRuleReport(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -220,6 +239,21 @@ func (c *Client) addOperationGetInsightRuleReportMiddlewares(stack *middleware.S
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -227,7 +261,6 @@ func newServiceMetadataMiddleware_opGetInsightRuleReport(region string) *awsmidd
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "monitoring",
 		OperationName: "GetInsightRuleReport",
 	}
 }

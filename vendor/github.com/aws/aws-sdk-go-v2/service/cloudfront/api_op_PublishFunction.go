@@ -4,20 +4,23 @@ package cloudfront
 
 import (
 	"context"
+	"fmt"
 	awsmiddleware "github.com/aws/aws-sdk-go-v2/aws/middleware"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/cloudfront/types"
 	"github.com/aws/smithy-go/middleware"
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Publishes a CloudFront function by copying the function code from the
-// DEVELOPMENT stage to LIVE. This automatically updates all cache behaviors that
-// are using this function to use the newly published copy in the LIVE stage. When
-// a function is published to the LIVE stage, you can attach the function to a
-// distribution’s cache behavior, using the function’s Amazon Resource Name (ARN).
-// To publish a function, you must provide the function’s name and version (ETag
-// value). To get these values, you can use ListFunctions and DescribeFunction.
+// DEVELOPMENT stage to LIVE . This automatically updates all cache behaviors that
+// are using this function to use the newly published copy in the LIVE stage.
+//
+// When a function is published to the LIVE stage, you can attach the function to
+// a distribution's cache behavior, using the function's Amazon Resource Name
+// (ARN).
+//
+// To publish a function, you must provide the function's name and version ( ETag
+// value). To get these values, you can use ListFunctions and DescribeFunction .
 func (c *Client) PublishFunction(ctx context.Context, params *PublishFunctionInput, optFns ...func(*Options)) (*PublishFunctionOutput, error) {
 	if params == nil {
 		params = &PublishFunctionInput{}
@@ -35,8 +38,8 @@ func (c *Client) PublishFunction(ctx context.Context, params *PublishFunctionInp
 
 type PublishFunctionInput struct {
 
-	// The current version (ETag value) of the function that you are publishing, which
-	// you can get using DescribeFunction.
+	// The current version ( ETag value) of the function that you are publishing,
+	// which you can get using DescribeFunction .
 	//
 	// This member is required.
 	IfMatch *string
@@ -61,6 +64,9 @@ type PublishFunctionOutput struct {
 }
 
 func (c *Client) addOperationPublishFunctionMiddlewares(stack *middleware.Stack, options Options) (err error) {
+	if err := stack.Serialize.Add(&setOperationInputMiddleware{}, middleware.After); err != nil {
+		return err
+	}
 	err = stack.Serialize.Add(&awsRestxml_serializeOpPublishFunction{}, middleware.After)
 	if err != nil {
 		return err
@@ -69,34 +75,41 @@ func (c *Client) addOperationPublishFunctionMiddlewares(stack *middleware.Stack,
 	if err != nil {
 		return err
 	}
+	if err := addProtocolFinalizerMiddlewares(stack, options, "PublishFunction"); err != nil {
+		return fmt.Errorf("add protocol finalizers: %v", err)
+	}
+
+	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
+		return err
+	}
 	if err = addSetLoggerMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddClientRequestIDMiddleware(stack); err != nil {
+	if err = addClientRequestID(stack); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddComputeContentLengthMiddleware(stack); err != nil {
+	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
-	if err = v4.AddComputePayloadSHA256Middleware(stack); err != nil {
+	if err = addComputePayloadSHA256(stack); err != nil {
 		return err
 	}
-	if err = addRetryMiddlewares(stack, options); err != nil {
+	if err = addRetry(stack, options); err != nil {
 		return err
 	}
-	if err = addHTTPSignerV4Middleware(stack, options); err != nil {
+	if err = addRawResponseToMetadata(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRawResponseToMetadata(stack); err != nil {
+	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
-	if err = awsmiddleware.AddRecordResponseTiming(stack); err != nil {
+	if err = addSpanRetryLoop(stack, options); err != nil {
 		return err
 	}
-	if err = addClientUserAgent(stack); err != nil {
+	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
 	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
@@ -105,10 +118,22 @@ func (c *Client) addOperationPublishFunctionMiddlewares(stack *middleware.Stack,
 	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
 		return err
 	}
+	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
 	if err = addOpPublishFunctionValidationMiddleware(stack); err != nil {
 		return err
 	}
 	if err = stack.Initialize.Add(newServiceMetadataMiddleware_opPublishFunction(options.Region), middleware.Before); err != nil {
+		return err
+	}
+	if err = addRecursionDetection(stack); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
@@ -120,6 +145,21 @@ func (c *Client) addOperationPublishFunctionMiddlewares(stack *middleware.Stack,
 	if err = addRequestResponseLogging(stack, options); err != nil {
 		return err
 	}
+	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -127,7 +167,6 @@ func newServiceMetadataMiddleware_opPublishFunction(region string) *awsmiddlewar
 	return &awsmiddleware.RegisterServiceMetadata{
 		Region:        region,
 		ServiceID:     ServiceID,
-		SigningName:   "cloudfront",
 		OperationName: "PublishFunction",
 	}
 }
