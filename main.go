@@ -13,8 +13,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 
-	cloudfrontclient "cloudfront-invalidation-metrics/internal/aws/cloudfront"
-	"cloudfront-invalidation-metrics/internal/metrics"
+	cloudfrontclient "github.com/skpr/cloudfront-invalidation-metrics/internal/aws/cloudfront"
+	"github.com/skpr/cloudfront-invalidation-metrics/internal/metrics"
 )
 
 const (
